@@ -41,28 +41,30 @@ namespace Online_Store.controllers.mvc
         [HttpGet("/[action]")]
         public IActionResult Signup()
         {
-            StringValues successCallbback = new StringValues();
-            if (Request.Query.TryGetValue("success", out successCallbback))
+            StringValues successCallback = new StringValues();
+            if (Request.Query.TryGetValue("success", out successCallback))
             {
-
-                if (String.Equals(successCallbback, "false"))
+                Console.WriteLine("success val: " +  successCallback);
+                if (String.Equals(successCallback, "false"))
                 {
+                    Console.WriteLine("something bad happened");
                     StringValues messageCallbback = new StringValues();
                     if (Request.Query.TryGetValue("message", out messageCallbback))
                     {
                         if(String.Equals(messageCallbback, "0"))
                         {
+                            Console.WriteLine("first error message case!");
                             Signup model = new Signup() { error = true, Message = "Please make sure passwords match!"};
                             return View(model);
                         }
                         else if (String.Equals(messageCallbback, "1"))
                         {
-                            Signup model = new Signup() { error = true, Message = "user Already Exists!" };
+                            Signup model = new Signup() { error = true, Message = "User Already Exists!" };
                             return View(model);
                         }
                     }
                 }
-                else if(String.Equals(successCallbback, "true"))
+                else if(String.Equals(successCallback, "true"))
                 {
                     Signup model = new Signup() { error = false, Message = "Success! Account Created!" };
                     return View(model);

@@ -93,9 +93,11 @@ namespace Online_Store.controllers.api
         [HttpPost("[action]")]
         public void Signup([FromForm] Binders.UserSignup req)
         {
-            if(!String.Equals(req.password, req.confPassword))
+            Console.WriteLine(req.password + " " + req.confPassword + " " + String.Equals(req.password, req.confPassword));
+            if(!(String.Equals(req.password, req.confPassword)))
             {
                 Response.Redirect("/Signup?success=false&message=0");
+                return;
             }
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
