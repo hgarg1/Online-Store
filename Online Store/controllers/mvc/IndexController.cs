@@ -46,9 +46,15 @@ namespace Online_Store.controllers.mvc
         }
 
         [HttpGet("/[action]")]
-        public IActionResult ContactUs()
+        public IActionResult Contact()
         {
-            return View("~/views/index/contact.cshtml");
+            return View();
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult Settings()
+        {
+            return View();
         }
     }
 }
