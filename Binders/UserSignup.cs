@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Binders
 {
-    public class UserSignup
+    public class UserSignup //used when a signup request is intiated, form data is bound to C# fields
     {
         public string firstName { get; set; }
         public string lastName { get; set; }

@@ -1,7 +1,7 @@
 ﻿using Binders;
 namespace Models
 {
-    public class User
+    public class User //used when we pull data from a table so we can access data like a normal object
     {
         public string firstName { get; set; }
         public string lastName { get; set; }
@@ -12,7 +12,7 @@ namespace Models
         public int age { get; set; }
         public int id { get; set; }
 
-        public override bool Equals(object? obj)
+        public override bool Equals(object? obj) //able to handle table to table checks and table to binder checks too
         {
             if(obj is Binders.UserLogin)
             {
@@ -29,7 +29,7 @@ namespace Models
             }
             else
             {
-                return false;
+                return false; //will never reach here
             }
         }
     }

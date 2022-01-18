@@ -20,7 +20,7 @@ namespace Online_Store.Filters
         public void OnActionExecuting(ActionExecutingContext context)
         {
             string? user = context.HttpContext.Session.GetString("user");
-            Console.WriteLine("user: " + user);
+            //first part is list of whitelisted pages, do NOT black list but rather whitelist
             if (
                 (
                 context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Login") == -1 
@@ -38,7 +38,7 @@ namespace Online_Store.Filters
             }
         }
 
-        public bool isValid(string user)
+        public bool isValid(string user)//used a lot, self explanatory
         {
             if(user == null || String.Equals(user, "")) { return false; } //precheck
 
@@ -76,6 +76,6 @@ namespace Online_Store.Filters
         }
 
         //after it reaches MVC controller
-        public void OnActionExecuted(ActionExecutedContext context){}
+        public void OnActionExecuted(ActionExecutedContext context){}//most probably never used as filter wouldn't be a filter then
     }
 }

@@ -13,7 +13,7 @@ namespace Online_Store.controllers.api
     public class AuthController : ControllerBase
     {
         private IConfiguration _configuration;
-        public AuthController(IConfiguration configuration)
+        public AuthController(IConfiguration configuration) //allows us to get connection string
         {
             _configuration = configuration;
         }
@@ -31,27 +31,26 @@ namespace Online_Store.controllers.api
             }
             else
             {
-                Console.WriteLine("Found record!--");
                 Models.User user = users.First();
                 if (user.Equals(req))
                 {
                     req.lastLogin = DateTime.Now.ToString();
                     sqlConnection.Execute("update [user] set lastLogin = @lastLogin where email = @username", req);
                     sqlConnection.Close();
-                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
+                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));//set session object for authentication into restircted pages
                     
                     Response.Redirect("/Index");
                 }
                 else
                 {
                     sqlConnection.Close();
-                    Response.Redirect("/Login?success=false");
+                    Response.Redirect("/Login?success=false");//add error so login can display such message
                 }
             }
         }
 
         [HttpGet("[action]")]
-        public void GetLogin()
+        public void GetLogin() //same as above but GET
         {
 
             Binders.UserLogin req = new Binders.UserLogin() { username = HttpContext.Request.Query["username"], password = HttpContext.Request.Query["password"] };
@@ -65,12 +64,11 @@ namespace Online_Store.controllers.api
             }
             else
             {
-                Console.WriteLine("Found record!--");
                 Models.User user = users.First();
                 if (user.Equals(req))
                 {
                     req.lastLogin = DateTime.Now.ToString();
-                    sqlConnection.Execute("update [user] set lastLogin = @lastLogin where email = @username", req);
+                    sqlConnection.Execute("update [user] set lastLogin = @lastLogin where email = @username", req); //updates last login
                     sqlConnection.Close();
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
 
@@ -88,7 +86,7 @@ namespace Online_Store.controllers.api
         public void Logout()
         {
 
-            AuthFilter auth = new AuthFilter(_configuration);
+            AuthFilter auth = new AuthFilter(_configuration);//pass through auth, providing means without adittional calls
             if (!auth.isValid(HttpContext.Session.GetString("user")))
             {
                 Response.Redirect("/Index?success=false&message=0");
@@ -114,7 +112,8 @@ namespace Online_Store.controllers.api
             {
                 req.lastLogin = null;
                 int rowsAffected = sqlConnection.Execute("insert into [user] (firstName, lastName, email, lastLogin, password, address, sex, age) " +
-                    "                                               values (@firstName, @lastName, @email, @lastLogin, @password, @address, @sex, @age)", req);
+                                                                    "values (@firstName, @lastName, @email, @lastLogin, @password, @address, @sex, @age)", req); //inserts bound object into data
+                //statement above is sysnonymous with a prepared statement
                 sqlConnection.Close();
                 Response.Redirect("/Signup?success=true");
             }

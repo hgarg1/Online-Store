@@ -1,6 +1,6 @@
 ﻿namespace Online_Store.pagemodels
 {
-    public class Login
+    public class Login //same as Index but allows changing of message as needed
     {
 
         public string message { get; private set; }
