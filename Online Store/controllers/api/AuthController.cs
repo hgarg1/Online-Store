@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Binders;
+using Online_Store.Filters;
 using Dapper;
 using System.Text.Json;
 using Microsoft.Data.SqlClient;
@@ -86,6 +87,13 @@ namespace Online_Store.controllers.api
         [HttpGet("[action]")]
         public void Logout()
         {
+
+            AuthFilter auth = new AuthFilter(_configuration);
+            if (!auth.isValid(HttpContext.Session.GetString("user")))
+            {
+                Response.Redirect("/Index?success=false&message=0");
+                return;
+            }
             HttpContext.Session.Clear();
             Response.Redirect("/Login");
         }
