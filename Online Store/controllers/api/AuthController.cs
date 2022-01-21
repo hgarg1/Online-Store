@@ -50,7 +50,6 @@ namespace Online_Store.controllers.api
                     sqlConnection.Execute("update [user] set lastLogin = @lastLogin where email = @username", req);
                     sqlConnection.Close();
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));//set session object for authentication into restircted pages
-                    
                     Response.Redirect("/Index");
                 }
                 else if (user.Equals(req) && user.emailVerified.Equals("false"))
@@ -182,6 +181,10 @@ namespace Online_Store.controllers.api
                 sqlConnection.Execute("update [user] set emailVerified = 'true' where email = @email", new {@email = reqUser.email});
                 sqlConnection.Execute("update [user] set email = @emailNew where email = @emailOld", new { @emailNew= arrayVal[1], @emailOld = reqUser.email });
                 sqlConnection.Close();
+                reqUser.emailVerified = "true";
+                reqUser.email = arrayVal[0];
+                HttpContext.Session.SetString("user", JsonSerializer.Serialize(reqUser)); //updates cache
+
 
                 Response.Redirect("/Email?success=true");
             }
@@ -208,6 +211,7 @@ namespace Online_Store.controllers.api
                 new {@firstName = reqUser.firstName,
                      @lastName = reqUser.lastName
             }).First();
+
             if(user == null)
             {
                 Response.Redirect("/Email?success=false&message=0"); //user doesn't exist

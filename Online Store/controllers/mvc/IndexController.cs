@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Online_Store.pagemodels;
+using System.Text.Json;
 
 namespace Online_Store.controllers.mvc
 {
@@ -54,7 +55,7 @@ namespace Online_Store.controllers.mvc
         [HttpGet("[action]")]
         public IActionResult Settings()
         {
-            return View();
+            return View(JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user")));
         }
     }
 }

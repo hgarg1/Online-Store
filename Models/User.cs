@@ -3,15 +3,18 @@ namespace Models
 {
     public class User //used when we pull data from a table so we can access data like a normal object
     {
-        public string firstName { get; set; }
-        public string lastName { get; set; }
-        public string email { get; set; }
-        public string lastLogin { get; set; }
-        public string password { get; set; }
-        public string address { get; set; }
+        public string? firstName { get; set; }
+        public string? lastName { get; set; }
+        public string? email { get; set; }
+        public string? lastLogin { get; set; }
+        public string? password { get; set; }
+        public string? address { get; set; }
         public int age { get; set; }
+        public string? sex { get; set; }
         public int id { get; set; }
-        public string emailVerified { get; set; }
+        public string? emailVerified { get; set; }
+
+        public string? emailOld { get; set; }
 
         public override bool Equals(object? obj) //able to handle table to table checks and table to binder checks too
         {
