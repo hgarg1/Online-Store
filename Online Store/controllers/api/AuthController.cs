@@ -109,7 +109,7 @@ namespace Online_Store.controllers.api
         }
 
         [HttpPost("[action]")]
-        public void Logout()
+        public void Logout(bool redirect = true)
         {
 
             AuthFilter auth = new AuthFilter(_configuration);//pass through auth, providing means without adittional calls
@@ -119,7 +119,10 @@ namespace Online_Store.controllers.api
                 return;
             }
             HttpContext.Session.Clear();
-            Response.Redirect("/Login");
+            if (redirect)
+            {
+                Response.Redirect("/Login");
+            }
         }
 
         [HttpPost("[action]")]
@@ -205,6 +208,7 @@ namespace Online_Store.controllers.api
                 Response.Redirect("/Email?success=false&message=0"); //user doesn't exist
                 return;
             }
+
             Models.User reqUser = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"));
 
             Models.User user = new SqlConnection(_configuration.GetConnectionString("SQL")).Query<Models.User>("select * from [user] where firstName = @firstName AND lastName = @lastName", 
@@ -226,10 +230,20 @@ namespace Online_Store.controllers.api
                 arrayVal[0] = null;
                 userTokens.Remove(reqUser.firstName + " " + reqUser.lastName);
                 userTokens.Add(reqUser.firstName + " " + reqUser.lastName, new string[] { randomKey, email});
+                //updates uer db and cache using prior token email pair to as old email
+                new SqlConnection(_configuration.GetConnectionString("SQL")).Execute("update [user] set email = @emailNew where email = @emailOld", new { @emailNew = email, @emailOld = arrayVal[1] });
+                reqUser.email = email;
+                HttpContext.Session.SetString("user", JsonSerializer.Serialize(reqUser));
+                //
             }
             else
             {
                 userTokens.Add(reqUser.firstName + " " + reqUser.lastName, new string[] { randomKey, email });
+                //updates uer db and cache using cache as old email
+                new SqlConnection(_configuration.GetConnectionString("SQL")).Execute("update [user] set email = @emailNew where email = @emailOld", new { @emailNew = email, @emailOld = reqUser.email });
+                reqUser.email = email;
+                HttpContext.Session.SetString("user", JsonSerializer.Serialize(reqUser));
+                //
             }
 
             SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
@@ -246,7 +260,7 @@ namespace Online_Store.controllers.api
             }
             else
             {
-                Response.Redirect("/Email?success=true");
+                Response.Redirect("/Login?success=false&message=email");
             }
         }
 

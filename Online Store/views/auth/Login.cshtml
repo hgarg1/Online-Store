@@ -9,7 +9,12 @@
 @model Online_Store.pagemodels.Login;
 <div class="container mt-5">
 
-    <p class="text-danger">@Model.message</p>
+    <p class="text-danger d-inline">@Model.message @{
+        if(Model.message.IndexOf("email") != -1){
+           <span style="color: black;">Click <a href="/Email?success=false&message=3">here.</a></span>
+        }
+    }
+    </p>
     <h1>Login to Your Online Store</h1>
     <form action="/Auth/Login" method="post">
         <div class="form-group">

@@ -31,7 +31,7 @@ namespace Online_Store.controllers.mvc
                     {
                         if(messageCallback.Equals("email"))
                         {
-                            Login model = new Login("Email Verification Sent! Please verify and try logging in again. Need to change your email? Click <a href='/Email?success=false&message=3'>here.</a>");
+                            Login model = new Login("Email Verification Sent! Please verify and try logging in again. Need to change your email?");
                             return View(model);
                         }
                     }
