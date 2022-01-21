@@ -11,6 +11,7 @@ namespace Models
         public string address { get; set; }
         public int age { get; set; }
         public int id { get; set; }
+        public string emailVerified { get; set; }
 
         public override bool Equals(object? obj) //able to handle table to table checks and table to binder checks too
         {

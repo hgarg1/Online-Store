@@ -20,20 +20,33 @@ namespace Online_Store.controllers.mvc
         public IActionResult Login()
         {
 
+            StringValues successCallback = new StringValues();
+            if(Request.Query.TryGetValue("success", out successCallback))
+            {
+             
+                if(String.Equals(successCallback, "false"))
+                {
+                    StringValues messageCallback = new StringValues();
+                    if (Request.Query.TryGetValue("message", out messageCallback))
+                    {
+                        if(messageCallback.Equals("email"))
+                        {
+                            Login model = new Login("Email Verification Sent! Please verify and try logging in again. Need to change your email? Click <a href='/Email?success=false&message=3'>here.</a>");
+                            return View(model);
+                        }
+                    }
+                    else
+                    {
+                        Login model = new Login("User name or password didn't work, please try again.");
+                        return View(model);
+                    }
+                }
+            }
             AuthFilter auth = new AuthFilter(_configuration);
             if (auth.isValid(HttpContext.Session.GetString("user")))
             {
                 User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"));
-                return RedirectToAction("GetLogin", "Auth", new UserLogin() {username = user.email, password = user.password});
-            }
-            StringValues successCallbback = new StringValues();
-            if(Request.Query.TryGetValue("success", out successCallbback))
-            {
-                if(String.Equals(successCallbback, "false"))
-                {
-                    Login model = new Login("User name or password didn't work, please try again.");
-                    return View(model);
-                }
+                return RedirectToAction("GetLogin", "Auth", new UserLogin() { username = user.email, password = user.password });
             }
             return View(new Login(""));
         }
@@ -66,11 +79,56 @@ namespace Online_Store.controllers.mvc
                 }
                 else if(String.Equals(successCallback, "true"))
                 {
-                    Signup model = new Signup() { error = false, Message = "Success! Account Created!" };
+                    Signup model = new Signup() { error = false, Message = "Success! Account Created! Please verify your email by clicking the link sent to it before you login (wrong email? click the button below to change & resend)." };
                     return View(model);
                 }
             }
             return View(new Signup());
+        }
+
+        [HttpGet("/[action]")]
+        public IActionResult Email()
+        {
+            StringValues successCallback = new StringValues();
+            if (Request.Query.TryGetValue("success", out successCallback))
+            {
+                Console.WriteLine("success val: " + successCallback);
+                if (String.Equals(successCallback, "false"))
+                {
+                    Console.WriteLine("something bad happened");
+                    StringValues messageCallbback = new StringValues();
+                    if (Request.Query.TryGetValue("message", out messageCallbback))
+                    {
+                        if (String.Equals(messageCallbback, "0"))
+                        {
+                            Email toInsert = new Email() { IsActive = false, Title = "Username not found please try again please by attempting to login", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
+                            return View(toInsert);
+                        }
+                        else if (String.Equals(messageCallbback, "1"))
+                        {
+                            Email toInsert = new Email() { IsActive = false, Title="Invalid Token Please request a new one.", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
+                            return View(toInsert);
+                        }
+                        else if (String.Equals(messageCallbback, "2"))
+                        {
+                            Email toInsert = new Email() { IsActive = false, Title="Your token is either expired or was never generated, please try again.", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
+                            return View(toInsert);
+                        }
+                        else if (String.Equals(messageCallbback, "3"))
+                        {
+                            Email toInsert = new Email() { IsActive = false, Title = "Please fill out the form to request a new link to the email", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
+                            return View(toInsert);
+                        }
+                    }
+                }
+                else if (String.Equals(successCallback, "true"))
+                {
+                    Email toInsert = new Email() { IsActive = true, Message = "Congratulations you are all set! You may no procede to login by clicking the button below", Title = "Email Verification Tool" };
+                    return View(toInsert);
+                }
+            }
+            Email model = new Email() { IsActive = false, Title = "Please fill out the form to request a new link to the email", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
+            return View(model);
         }
     }
 }

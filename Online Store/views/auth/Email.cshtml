@@ -1,0 +1,44 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewBag.Title = "Verify your email | Store Online";
+    Layout = "~/views/_restricted.cshtml";
+}
+
+@model Online_Store.pagemodels.Email;
+
+<div class="container w-75">
+
+    @{
+        if (Model.IsActive)
+        {
+            <h1 class="text-success">@Model.Title</h1>
+            <p class="text-success">@Model.Message</p>
+            <p>You may now login:</p>
+            <button class="btn btn-primary" type="button" onclick="location.assign('/Login')">Login</button>
+        }
+        else
+        {
+            <h1 class="text-warning">@Model.Title</h1>
+            if (!@Model.Title.Equals("Username not found please try again please by attempting to login"))
+            {
+                <p class="text-danger">@Model.Message</p>
+                <form action="/Auth/SendEmailValidation" method="get" class="container">
+                    <div class="form-group">
+                        <label class="form-label" for="Email">Email:</label>
+                        <input class="form-control" name="email" id="Email" type="email" autocomplete="email" placeholder="Email" required />
+                        <br />
+                        <button class="btn btn-primary" type="submit">Resend Email</button>
+                    </div>
+                </form>
+            }
+        }
+    }
+</div>
+
+<style>
+    body{
+        background-color: aquamarine;
+    }
+</style>

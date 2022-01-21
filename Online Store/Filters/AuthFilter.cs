@@ -24,7 +24,11 @@ namespace Online_Store.Filters
             if (
                 (
                 context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Login") == -1 
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Signup") == -1 
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Signup") == -1
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Email") == -1
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidateEmail") == -1
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SendEmailValidation") == -1
+                
                 ) 
                 && 
                 (

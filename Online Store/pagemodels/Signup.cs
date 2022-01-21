@@ -8,6 +8,7 @@
         public Signup()
         {
             error = false;
+            Message = "";
         }
     }
 }
