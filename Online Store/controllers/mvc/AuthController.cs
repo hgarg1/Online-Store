@@ -23,13 +23,13 @@ namespace Online_Store.controllers.mvc
             StringValues successCallback = new StringValues();
             if(Request.Query.TryGetValue("success", out successCallback))
             {
-             
-                if(String.Equals(successCallback, "false"))
+
+                if (String.Equals(successCallback, "false"))
                 {
                     StringValues messageCallback = new StringValues();
                     if (Request.Query.TryGetValue("message", out messageCallback))
                     {
-                        if(messageCallback.Equals("email"))
+                        if (messageCallback.Equals("email"))
                         {
                             Login model = new Login("Email Verification Sent! Please verify and try logging in again. Need to change your email?");
                             return View(model);
@@ -39,6 +39,18 @@ namespace Online_Store.controllers.mvc
                     {
                         Login model = new Login("User name or password didn't work, please try again.");
                         return View(model);
+                    }
+                }
+                else if (String.Equals(successCallback, "true"))
+                {
+                    StringValues messageCallback = new StringValues();
+                    if (Request.Query.TryGetValue("message", out messageCallback))
+                    {
+                        if (messageCallback.Equals("reset"))
+                        {
+                            Login model = new Login("Your Password Has Been Successfully Reset Please Login Now! Thanks for shopping with us!");
+                            return View(model);
+                        }
                     }
                 }
             }
@@ -119,6 +131,11 @@ namespace Online_Store.controllers.mvc
                             Email toInsert = new Email() { IsActive = false, Title = "Please fill out the form to request a new link to the email", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
                             return View(toInsert);
                         }
+                        else if (String.Equals(messageCallbback, "4"))
+                        {
+                            Email toInsert = new Email() { IsActive = false, Title = "That Email Already In Use Please Reset Password", Message = "Your email is already being used for another account. Please try another email or use the forget password feature." };
+                            return View(toInsert);
+                        }
                     }
                 }
                 else if (String.Equals(successCallback, "true"))
@@ -129,6 +146,55 @@ namespace Online_Store.controllers.mvc
             }
             Email model = new Email() { IsActive = false, Title = "Please fill out the form to request a new link to the email", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
             return View(model);
+        }
+
+        [HttpGet("/[action]")]
+        public IActionResult ForgotPassword()
+        {
+            StringValues successCallback = new StringValues();
+            if (Request.Query.TryGetValue("success", out successCallback))
+            {
+                Console.WriteLine("success val: " + successCallback);
+                if (String.Equals(successCallback, "false"))
+                {
+                    Console.WriteLine("something bad happened");
+                    StringValues messageCallback = new StringValues();
+                    if (Request.Query.TryGetValue("message", out messageCallback))
+                    {
+                        if (String.Equals(messageCallback, "user"))
+                        {
+                            ForgotPassword model = new ForgotPassword() { message = "Email Provided is invalid.", showSetPassword = false };
+                            return View(model);
+                        }else if (String.Equals(messageCallback, "token")){
+                            ForgotPassword model = new ForgotPassword() { message = "Token Provided is invalid. Please try again using the form.", showSetPassword = false };
+                            return View(model);
+                        }
+                        else if (String.Equals(messageCallback, "session"))
+                        {
+                            ForgotPassword model = new ForgotPassword() { message = "Session Expired Please Request A New Link", showSetPassword = false };
+                            return View(model);
+                        }
+                    }
+                }else if (String.Equals(successCallback, "true"))
+                {
+                    StringValues messageCallbback = new StringValues();
+                    if (Request.Query.TryGetValue("message", out messageCallbback))
+                    {
+                        if (String.Equals(messageCallbback, "email"))
+                        {
+                            ForgotPassword model = new ForgotPassword() { message = "Sucess! Email is sent please paste the link in THIS browser.", showSetPassword = false };
+                            return View(model);
+                        }else if(String.Equals(messageCallbback, "accepted"))
+                        {
+                            ForgotPassword model = new ForgotPassword() { message = "Sucess! Token accepted please enter user details", showSetPassword = true };
+                            return View(model);
+                        }
+                    }
+                        
+                }
+            }
+            ForgotPassword pswdModel = new ForgotPassword() { message = "Forgot Password to Your Online Store? No worries, enter the email and we will send a link where you can set a new one", showSetPassword = false };
+            return View(pswdModel);
         }
     }
 }

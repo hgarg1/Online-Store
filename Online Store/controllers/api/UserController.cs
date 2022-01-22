@@ -22,13 +22,14 @@ namespace Online_Store.controllers.api
         {
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
+
             req.emailOld = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user")).email;
             sqlConnection.Execute("update [user] set firstName = @firstName, lastName = @lastName, email = @email, password = @password, age=@age, sex=@sex, address = @address, emailVerified = 'false' where email = @emailOld", req);
             sqlConnection.Close();
             HttpContext.Session.SetString("user", JsonSerializer.Serialize(req)); //updates cache
             AuthController authNeeds = new AuthController(_configuration); //pass through auth like last time
-            authNeeds.SendEmailValidation(req.email, true);
-            authNeeds.Logout(false);
+            authNeeds.SendEmailValidation(req.email, true, HttpContext.Session.GetString("user"), true);
+            authNeeds.Logout(true, false);
             Response.Redirect("/Login?success=false&message=email");
         }
     }

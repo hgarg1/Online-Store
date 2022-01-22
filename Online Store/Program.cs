@@ -12,7 +12,7 @@ builder.Services.AddMvc();
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(90);
+    options.IdleTimeout = TimeSpan.FromHours(5);
     options.Cookie.HttpOnly = true;
 });
 

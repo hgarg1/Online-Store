@@ -28,7 +28,9 @@ namespace Online_Store.Filters
                 && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Email") == -1
                 && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidateEmail") == -1
                 && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SendEmailValidation") == -1
-                
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidatePasswordResetLink") == -1
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SetPassword") == -1
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/ForgotPassword") == -1
                 ) 
                 && 
                 (

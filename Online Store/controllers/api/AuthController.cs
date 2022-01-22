@@ -49,6 +49,7 @@ namespace Online_Store.controllers.api
                     req.lastLogin = DateTime.Now.ToString();
                     sqlConnection.Execute("update [user] set lastLogin = @lastLogin where email = @username", req);
                     sqlConnection.Close();
+                    user.lastLogin = req.lastLogin;
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));//set session object for authentication into restircted pages
                     Response.Redirect("/Index");
                 }
@@ -56,7 +57,7 @@ namespace Online_Store.controllers.api
                 {
                     sqlConnection.Close();
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
-                    SendEmailValidation(req.username, true);
+                    SendEmailValidation(req.username, false, null, true);
                     Response.Redirect("/Login?success=false&message=email");
                 }
                 else
@@ -96,8 +97,9 @@ namespace Online_Store.controllers.api
                 else if (user.Equals(req) && user.emailVerified.Equals("false"))
                 {
                     sqlConnection.Close();
+                    user.lastLogin = req.lastLogin;
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
-                    SendEmailValidation(req.username, true);
+                    SendEmailValidation(req.username, false, null, true);
                     Response.Redirect("/Login?success=false&message=email");
                 }
                 else
@@ -109,11 +111,11 @@ namespace Online_Store.controllers.api
         }
 
         [HttpPost("[action]")]
-        public void Logout(bool redirect = true)
+        public void Logout(bool bypassCacheCheck = false, bool redirect = true)
         {
 
             AuthFilter auth = new AuthFilter(_configuration);//pass through auth, providing means without adittional calls
-            if (!auth.isValid(HttpContext.Session.GetString("user")))
+            if (!bypassCacheCheck && !auth.isValid(HttpContext.Session.GetString("user")))
             {
                 Response.Redirect("/Index?success=false&message=0");
                 return;
@@ -146,7 +148,7 @@ namespace Online_Store.controllers.api
                 sqlConnection.Close();
                 //partial cache save, only enough for send email to work
                 HttpContext.Session.SetString("user", JsonSerializer.Serialize(new Models.User() { firstName = req.firstName, lastName = req.lastName}));
-                SendEmailValidation(req.email, true);
+                SendEmailValidation(req.email, false, null, true);
                 Response.Redirect("/Signup?success=true");
             }
             else
@@ -198,27 +200,41 @@ namespace Online_Store.controllers.api
         }
         
         [HttpGet("[action]")]
-        public void SendEmailValidation([FromQuery] string email, bool noRedirect = false)
+        public void SendEmailValidation([FromQuery] string email, bool bypassCacheCheck = false, string? userCache = null, bool noRedirect = false)
         {
             Console.WriteLine(email);
 
-            string? cache = HttpContext.Session.GetString("user");
-            if (cache == null)
+            string? cache = null;
+            if (bypassCacheCheck)
             {
-                Response.Redirect("/Email?success=false&message=0"); //user doesn't exist
+                cache = userCache;
+            }
+            else
+            {
+                cache = HttpContext.Session.GetString("user");
+                if (cache == null)
+                {
+                    Response.Redirect("/Email?success=false&message=0"); //user doesn't exist
+                    return;
+                }
+            }
+            
+
+            Models.User reqUser = JsonSerializer.Deserialize<Models.User>(cache);
+
+            Models.User user = new SqlConnection(_configuration.GetConnectionString("SQL")).Query<Models.User>("select * from [user] where email = @email", 
+                new {@email = email}
+            ).First();
+
+            if(user != null)
+            {
+                Response.Redirect("/Email?success=false&message=4"); //email already mapped to someone
                 return;
             }
 
-            Models.User reqUser = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"));
-
-            Models.User user = new SqlConnection(_configuration.GetConnectionString("SQL")).Query<Models.User>("select * from [user] where firstName = @firstName AND lastName = @lastName", 
-                new {@firstName = reqUser.firstName,
-                     @lastName = reqUser.lastName
-            }).First();
-
-            if(user == null)
+            if (user.emailVerified.Equals("true"))
             {
-                Response.Redirect("/Email?success=false&message=0"); //user doesn't exist
+                Response.Redirect("/");
                 return;
             }
 
@@ -233,7 +249,10 @@ namespace Online_Store.controllers.api
                 //updates uer db and cache using prior token email pair to as old email
                 new SqlConnection(_configuration.GetConnectionString("SQL")).Execute("update [user] set email = @emailNew where email = @emailOld", new { @emailNew = email, @emailOld = arrayVal[1] });
                 reqUser.email = email;
-                HttpContext.Session.SetString("user", JsonSerializer.Serialize(reqUser));
+                if (!bypassCacheCheck)
+                {
+                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(reqUser));
+                }
                 //
             }
             else
@@ -242,7 +261,10 @@ namespace Online_Store.controllers.api
                 //updates uer db and cache using cache as old email
                 new SqlConnection(_configuration.GetConnectionString("SQL")).Execute("update [user] set email = @emailNew where email = @emailOld", new { @emailNew = email, @emailOld = reqUser.email });
                 reqUser.email = email;
-                HttpContext.Session.SetString("user", JsonSerializer.Serialize(reqUser));
+                if (!bypassCacheCheck)
+                {
+                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(reqUser));
+                }
                 //
             }
 
@@ -264,7 +286,7 @@ namespace Online_Store.controllers.api
             }
         }
 
-        public string GetUniqueKey(int size)
+        private string GetUniqueKey(int size)
         {
             char[] chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
 
@@ -282,6 +304,122 @@ namespace Online_Store.controllers.api
                 result.Append(chars[idx]);
             }
             return result.ToString();
+        }
+
+        [HttpPost("[action]")]
+        public void ForgotPassword([FromForm] Binders.UserLogin req)
+        {
+            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
+            sqlConnection.Open();
+            Models.User user = sqlConnection.Query<Models.User>("select * from [user] where email = @email", new {@email = req.username}).First();
+            if (user == null)
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=user");
+                return;
+            }
+            sqlConnection.Close();
+
+            string[] arrayVal = null;
+            if (userTokens.TryGetValue(user.firstName + " " + user.lastName, out arrayVal))
+            {
+                userTokens.Remove(user.firstName + " " + user.lastName);
+                arrayVal = new string[]{ GetUniqueKey(32), req.username};
+                userTokens.Add(user.firstName + " " + user.lastName, arrayVal);
+            }
+            else
+            {
+                arrayVal = new string[]{ GetUniqueKey(32), req.username};
+                userTokens.Add(user.firstName + " " + user.lastName, arrayVal);
+            }
+
+            SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
+            smtpClient.EnableSsl = true;
+            smtpClient.UseDefaultCredentials = false;
+            smtpClient.Credentials = new NetworkCredential("hgarg1@terpmail.umd.edu", "Deepak@2003_101");
+            smtpClient.Send(new MailMessage("hgarg1@terpmail.umd.edu", req.username, "Your Password Reset Link Link | Online Store", $"Please use this url in the SAME browser when resseting your password.\nLink: https://localhost:7108/Auth/ValidatePasswordResetLink/{arrayVal[0]}\nThe link will expire in 5 hours.\nThanks for shopping with us!\nSincerely, Online Store Team"));
+
+            HttpContext.Session.SetString("user", req.username);
+
+            Task.Delay(new TimeSpan(5, 0, 0)).ContinueWith(action => {
+                userTokens.Remove(user.firstName + " " + user.lastName);
+            });
+            Response.Redirect("/ForgotPassword?success=true&message=email");
+        }
+
+        [HttpGet("[action]/{token}")]
+        public void ValidatePasswordResetLink(string token)
+        {
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=session");
+                return;
+            }
+
+            if (token == null)
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=token");
+                return;
+            }
+
+            if(token.Equals(""))
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=token");
+                return;
+            }
+
+            
+
+            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
+            sqlConnection.Open();
+            Models.User user = sqlConnection.Query<Models.User>("select * from [user] where email = @email", new { @email = HttpContext.Session.GetString("user") }).First();
+            sqlConnection.Close();
+            string[] arrayVal = userTokens.GetValueOrDefault(user.firstName + " " + user.lastName);
+            if(arrayVal == null)
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=session");
+                return;
+            }
+
+            if (!arrayVal[0].Equals(token))
+            {
+                HttpContext.Session.SetString("user", "false");
+                Response.Redirect("/ForgotPassword?success=false&message=token");
+            }
+            else
+            {
+                userTokens.Remove(user.firstName + " " + user.lastName);
+                HttpContext.Session.SetString("user", "true");
+                Response.Redirect("/ForgotPassword?success=true&message=accepted");
+            }
+        }
+
+        [HttpPost("[action]")]
+        public void SetPassword([FromForm] Binders.UserLogin req)
+        {
+            if (HttpContext.Session.GetString("user") == null)
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=session");
+                return;
+            }
+            else if (HttpContext.Session.GetString("user").Equals("false"))
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=token");
+                return;
+            }
+            else
+            {
+                SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
+                sqlConnection.Open();
+                int numRows = sqlConnection.Execute("update [user] set password = @password where email = @username", req);
+                if(numRows == 1)
+                {
+                    HttpContext.Session.Clear();
+                    Response.Redirect("/Login?success=true&message=reset");
+                }
+                else
+                {
+                }
+            }
         }
     }
 }
