@@ -120,7 +120,12 @@ namespace Online_Store.controllers.api
                 Response.Redirect("/Index?success=false&message=0");
                 return;
             }
-            HttpContext.Session.Clear();
+
+            if (!bypassCacheCheck)
+            {
+                HttpContext.Session.Clear();
+            }
+
             if (redirect)
             {
                 Response.Redirect("/Login");
@@ -142,8 +147,8 @@ namespace Online_Store.controllers.api
             if(isExisting == null)
             {
                 req.lastLogin = null;
-                int rowsAffected = sqlConnection.Execute("insert into [user] (firstName, lastName, email, lastLogin, password, address, sex, age, emailVerified) " +
-                                                                    "values (@firstName, @lastName, @email, @lastLogin, @password, @address, @sex, @age, 'false')", req); //inserts bound object into data
+                int rowsAffected = sqlConnection.Execute("insert into [user] (firstName, lastName, email, lastLogin, password, address, sex, age, emailVerified, ethnicity) " +
+                                                                    "values (@firstName, @lastName, @email, @lastLogin, @password, @address, @sex, @age, 'false', @ethnicity)", req); //inserts bound object into data
                 //statement above is sysnonymous to a prepared statement
                 sqlConnection.Close();
                 //partial cache save, only enough for send email to work
@@ -200,14 +205,14 @@ namespace Online_Store.controllers.api
         }
         
         [HttpGet("[action]")]
-        public void SendEmailValidation([FromQuery] string email, bool bypassCacheCheck = false, string? userCache = null, bool noRedirect = false)
+        public void SendEmailValidation([FromQuery] string email, bool bypassCacheCheck = false, HttpContext userCache = null, bool noRedirect = false)
         {
             Console.WriteLine(email);
 
             string? cache = null;
             if (bypassCacheCheck)
             {
-                cache = userCache;
+                cache = userCache.Session.GetString("user");
             }
             else
             {
@@ -225,12 +230,6 @@ namespace Online_Store.controllers.api
             Models.User user = new SqlConnection(_configuration.GetConnectionString("SQL")).Query<Models.User>("select * from [user] where email = @email", 
                 new {@email = email}
             ).First();
-
-            if(user != null)
-            {
-                Response.Redirect("/Email?success=false&message=4"); //email already mapped to someone
-                return;
-            }
 
             if (user.emailVerified.Equals("true"))
             {
@@ -272,7 +271,7 @@ namespace Online_Store.controllers.api
             smtpClient.EnableSsl = true;
             smtpClient.UseDefaultCredentials = false;
             smtpClient.Credentials = new NetworkCredential("hgarg1@terpmail.umd.edu", "Deepak@2003_101");
-            smtpClient.Send(new MailMessage("hgarg1@terpmail.umd.edu", email, "Your Access Link | Online Store", $"Please use this url in the SAME browser when confirming your email.\n Link: https://localhost:7108/Auth/ValidateEmail/{randomKey}\nThe link will expire in 5 hours.\nThanks for shopping with us!\nSincerely, Online Store Team"));
+            smtpClient.Send(new MailMessage("hgarg1@terpmail.umd.edu", email, "Your Access Link | Online Store", $"Please use this url in the SAME browser when confirming your email.\nLink: https://localhost:7108/Auth/ValidateEmail/{randomKey}\nThe link will expire in 5 hours.\nThanks for shopping with us!\nSincerely, Online Store Team"));
             Task.Delay(new TimeSpan(5, 0, 0)).ContinueWith(action => { 
                 userTokens.Remove(reqUser.firstName + " " + reqUser.lastName);
             });
@@ -311,7 +310,15 @@ namespace Online_Store.controllers.api
         {
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
-            Models.User user = sqlConnection.Query<Models.User>("select * from [user] where email = @email", new {@email = req.username}).First();
+            Models.User user = null;
+            try
+            {
+                user = sqlConnection.Query<Models.User>("select * from [user] where email = @email", new { @email = req.username }).First();
+            }catch(InvalidOperationException e)
+            {
+                Response.Redirect("/ForgotPassword?success=false&message=user");
+                return;
+            }
             if (user == null)
             {
                 Response.Redirect("/ForgotPassword?success=false&message=user");
@@ -337,7 +344,7 @@ namespace Online_Store.controllers.api
             smtpClient.UseDefaultCredentials = false;
             smtpClient.Credentials = new NetworkCredential("hgarg1@terpmail.umd.edu", "Deepak@2003_101");
             smtpClient.Send(new MailMessage("hgarg1@terpmail.umd.edu", req.username, "Your Password Reset Link Link | Online Store", $"Please use this url in the SAME browser when resseting your password.\nLink: https://localhost:7108/Auth/ValidatePasswordResetLink/{arrayVal[0]}\nThe link will expire in 5 hours.\nThanks for shopping with us!\nSincerely, Online Store Team"));
-
+            
             HttpContext.Session.SetString("user", req.username);
 
             Task.Delay(new TimeSpan(5, 0, 0)).ContinueWith(action => {

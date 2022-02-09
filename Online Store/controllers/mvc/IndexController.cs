@@ -49,13 +49,28 @@ namespace Online_Store.controllers.mvc
         [HttpGet("/[action]")]
         public IActionResult Contact()
         {
-            return View();
+            StringValues successCallback = new StringValues();
+            if (Request.Query.TryGetValue("success", out successCallback))
+            {
+
+                if (String.Equals(successCallback, "false"))
+                {
+                    return View(new Contact { IsSuccess = false, Message = "Something Wrong Happened Please Try Again!"});
+                }
+                else if(String.Equals(successCallback, "true"))
+                {
+                    return View(new Contact {  Message = "Success! Email sent to recipient." });
+                }
+            }
+            return View(new Contact { IsSuccess = null, Message = "" });
         }
 
         [HttpGet("[action]")]
         public IActionResult Settings()
         {
-            return View(JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user")));
+            Settings model = JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user"));
+            model.IsActive = true;
+            return View(model);
         }
     }
 }

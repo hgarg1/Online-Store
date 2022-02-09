@@ -6,7 +6,7 @@
     Layout = "~/views/_Layout.cshtml";
 }
 
-@model Models.User;
+@model Online_Store.pagemodels.Settings;
 
 <div class="container mt-5 pb-2">
     <h1 class="text-warning text-center">Neeed to update your information? Here is the place to do it.</h1>
@@ -15,17 +15,17 @@
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="inputFName">FirstName</label>
-                <input type="text" class="form-control" id="inputFName" name="firstName" placeholder=@Model.firstName required>
+                <input type="text" class="form-control" id="inputFName" name="firstName" placeholder=@Model.firstName value=@Model.firstName required>
             </div>
             <div class="form-group col-md-6">
-                <label for="inputLName">Password</label>
-                <input type="text" class="form-control" id="inputLName" name="lastName" placeholder=@Model.lastName required>
+                <label for="inputLName">LastName</label>
+                <input type="text" class="form-control" id="inputLName" name="lastName" placeholder=@Model.lastName value=@Model.lastName required>
             </div>
         </div>
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="inputEmail4">Email</label>
-                <input type="email" class="form-control" id="inputEmail4" name="email" placeholder=@Model.email required>
+                <input type="email" class="form-control" id="inputEmail4" name="email" placeholder=@Model.email value=@Model.email required>
             </div>
             <div class="form-group col-md-6">
                 <label for="inputPassword4">Password</label>
@@ -34,16 +34,20 @@
         </div>
         <div class="form-group">
             <label for="inputAddress">Address</label>
-            <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.address" required>
+            <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.address" value="@Model.address" required>
         </div>
         <div class="row">
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
                 <label for="inputAge">Age</label>
-                <input type="number" class="form-control" id="inputAge" name="age" placeholder=@Model.age required>
+                <input type="number" class="form-control" id="inputAge" name="age" placeholder=@Model.age value=@Model.age required>
             </div>
-            <div class="form-group col-md-6">
+            <div class="form-group col-md-4">
                 <label for="inputState">Gender</label>
-                <input type="text" class="form-control" id="inputGender" name="sex" placeholder=@Model.sex required>
+                <input type="text" class="form-control" id="inputGender" name="sex" placeholder=@Model.sex value=@Model.sex required>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputState">Ethnicity</label>
+                <input type="text" class="form-control" id="inputGender" name="ethnicity" placeholder="@Model.ethnicity" value="@Model.ethnicity" required>
             </div>
         </div>
         <div class="form-group">

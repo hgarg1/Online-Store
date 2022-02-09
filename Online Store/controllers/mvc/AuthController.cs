@@ -1,5 +1,4 @@
-﻿using Binders;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Models;
 using Online_Store.Filters;
@@ -58,7 +57,7 @@ namespace Online_Store.controllers.mvc
             if (auth.isValid(HttpContext.Session.GetString("user")))
             {
                 User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"));
-                return RedirectToAction("GetLogin", "Auth", new UserLogin() { username = user.email, password = user.password });
+                return RedirectToAction("GetLogin", "Auth", new Binders.UserLogin() { username = user.email, password = user.password });
             }
             return View(new Login(""));
         }
@@ -118,12 +117,12 @@ namespace Online_Store.controllers.mvc
                         }
                         else if (String.Equals(messageCallbback, "1"))
                         {
-                            Email toInsert = new Email() { IsActive = false, Title="Invalid Token Please request a new one.", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
+                            Email toInsert = new Email() { IsActive = false, Title = "Invalid Token Please request a new one.", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
                             return View(toInsert);
                         }
                         else if (String.Equals(messageCallbback, "2"))
                         {
-                            Email toInsert = new Email() { IsActive = false, Title="Your token is either expired or was never generated, please try again.", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
+                            Email toInsert = new Email() { IsActive = false, Title = "Your token is either expired or was never generated, please try again.", Message = "Welcome to the Email Verification System. Please input your email and click the link that is sent. Thank you for shopping with us!" };
                             return View(toInsert);
                         }
                         else if (String.Equals(messageCallbback, "3"))
