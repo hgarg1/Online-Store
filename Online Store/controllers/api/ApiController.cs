@@ -10,6 +10,12 @@ namespace Online_Store.controllers.api
     [ApiController]
     public class ApiController : ControllerBase
     {
+        private IConfiguration _configuration;
+        public ApiController(IConfiguration _config)
+        {
+            _configuration = _config;
+        }
+
         [HttpPost("[action]")]
         public void Email([FromForm] Email email)
         {
@@ -17,8 +23,8 @@ namespace Online_Store.controllers.api
             SmtpClient smtpClient = new SmtpClient("smtp.gmail.com", 587);
             smtpClient.EnableSsl = true;
             smtpClient.UseDefaultCredentials = false;
-            smtpClient.Credentials = new NetworkCredential("hgarg1@terpmail.umd.edu", "Deepak@2003_101");
-            smtpClient.Send(new MailMessage(email.From, "hgarg1@terpmail.umd.edu", $"Online Store | Form Submission: {email.UserName}",email.Body+$"\nReply to: {email.From} to get back in touch!"));
+            smtpClient.Credentials = new NetworkCredential("hgarg1@terpmail.umd.edu", _configuration["SMTP:Password"]);
+            smtpClient.Send(new MailMessage(email.From, "hgarg1@terpmail.umd.edu", $"Online Store | Form Submission: {email.UserName}","Inquiry Subject: " + email.Subject + "\n" + email.Body+$"\nReply to: {email.From} to get back in touch!"));
             Response.Redirect("/Contact?success=true");
         }
     }
