@@ -28,7 +28,6 @@ namespace Online_Store.controllers.api
         [HttpPost("[action]")]
         public void Login([FromForm] Binders.UserLogin req)
         {
-            Console.WriteLine("incoming user: " + req.username + " " + req.password);
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
             IEnumerable<Models.User> users = sqlConnection.Query<Models.User>("select * from [user] where email = @username AND password = @password", req);

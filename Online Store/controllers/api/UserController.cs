@@ -28,7 +28,7 @@ namespace Online_Store.controllers.api
             req.emailOld = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user")).email;
             sqlConnection.Close();
             HttpContext.Session.SetString("user", JsonSerializer.Serialize(req)); //updates cache
-            if(!String.Equals(req.email, req.email))
+            if(!String.Equals(req.email, req.emailOld))
             {
                 sqlConnection.Execute("update [user] set firstName = @firstName, lastName = @lastName, email = @email, password = @password, age=@age, sex=@sex, address = @address, emailVerified = 'false', ethnicity = @ethnicity where email = @emailOld", req);
                 authNeeds.SendEmailValidation(req.email, true);
@@ -38,9 +38,9 @@ namespace Online_Store.controllers.api
             }
             else
             {
+                Console.WriteLine("same email being updated!");
                 sqlConnection.Execute("update [user] set firstName = @firstName, lastName = @lastName, email = @email, password = @password, age=@age, sex=@sex, address = @address, emailVerified = 'true', ethnicity = @ethnicity where email = @emailOld", req);
-                authNeeds.Logout(true, false);
-                Response.Redirect("/Login");
+                Response.Redirect("/Settings");
                 return;
             }
         }

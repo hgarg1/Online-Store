@@ -30,7 +30,8 @@ namespace Models
                     && String.Equals(lastName, ((Models.User)obj).lastName)
                     && String.Equals(address, ((Models.User)obj).address)
                     && String.Equals($"{age}", $"{((Models.User)obj).age}")
-                    && String.Equals($"{id}", $"{((Models.User)obj).id}");
+                    && String.Equals($"{id}", $"{((Models.User)obj).id}")
+                    && String.Equals($"{sex}", $"{((Models.User)obj).sex}");
             }
             else
             {
