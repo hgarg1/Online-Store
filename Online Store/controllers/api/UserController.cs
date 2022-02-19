@@ -12,9 +12,11 @@ namespace Online_Store.controllers.api
     public class UserController : ControllerBase
     {
         private IConfiguration _configuration;
+        private AuthController authNeeds;
         public UserController(IConfiguration configuration)
         {
             _configuration = configuration;
+            authNeeds = new AuthController(_configuration); //pass through auth
         }
 
         [HttpPost("[action]")]
@@ -26,11 +28,10 @@ namespace Online_Store.controllers.api
             req.emailOld = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user")).email;
             sqlConnection.Close();
             HttpContext.Session.SetString("user", JsonSerializer.Serialize(req)); //updates cache
-            AuthController authNeeds = new AuthController(_configuration); //pass through auth like last time
             if(!String.Equals(req.email, req.email))
             {
                 sqlConnection.Execute("update [user] set firstName = @firstName, lastName = @lastName, email = @email, password = @password, age=@age, sex=@sex, address = @address, emailVerified = 'false', ethnicity = @ethnicity where email = @emailOld", req);
-                authNeeds.SendEmailValidation(req.email, true, HttpContext, true);
+                authNeeds.SendEmailValidation(req.email, true);
                 authNeeds.Logout(true, false);
                 Response.Redirect("/Login?success=false&message=email");
                 return;
