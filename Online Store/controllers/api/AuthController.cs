@@ -28,6 +28,7 @@ namespace Online_Store.controllers.api
         [HttpPost("[action]")]
         public void Login([FromForm] Binders.UserLogin req)
         {
+
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
             IEnumerable<Models.User> users = sqlConnection.Query<Models.User>("select * from [user] where email = @username AND password = @password", req);
@@ -416,6 +417,11 @@ namespace Online_Store.controllers.api
                 {
                 }
             }
+        }
+
+        public void Foo(String name, int age, out String result)
+        {
+            result = "name: " + name + " age: " + age;
         }
     }
 }
