@@ -44,5 +44,22 @@ namespace Online_Store.controllers.api
                 return;
             }
         }
+
+        [HttpPost("[action]")]
+        public void Delete()
+        {
+            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
+            sqlConnection.Open();
+
+            Models.User req = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"));
+
+            sqlConnection.Execute("delete from [user] where email = @email AND password = @password", new { 
+                @email = req.email, @password = req.password 
+            });
+            sqlConnection.Close();
+
+            HttpContext.Session.Clear();
+            Response.Redirect("/Login");
+        }
     }
 }

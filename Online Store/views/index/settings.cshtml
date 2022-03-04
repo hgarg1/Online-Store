@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="form-group">
+            <div class="form-group col-md-12">
                 <label for="inputAddress">Address</label>
                 <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.address" value="@Model.address" required>
             </div>
@@ -53,13 +53,39 @@
                 <input type="text" class="form-control" id="inputGender" name="ethnicity" placeholder="@Model.ethnicity" value="@Model.ethnicity" required>
             </div>
         </div>
-        <div class="form-group">
-            <label for="lastLogin">Last Login</label>
-            <input type="text" class="form-control" id="lastLogin" readonly value="@Model.lastLogin">
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="lastLogin">Last Login</label>
+                <input type="text" class="form-control" id="lastLogin" readonly value="@Model.lastLogin">
+            </div>
         </div>
         <div class="w-100 pt-2 pb-2"></div>
-        <button type="submit" class="btn btn-primary">Change Info</button>
+        <button type="submit" class="btn btn-primary col-md-12">Change Info</button>
     </form>
+    <div class="pt-2 pb-2 w-100"></div>
+    <form id="DeleteUserForm" class="d-grid">
+        <button type="submit" class="btn btn-danger col-md-12">Delete Account</button>
+    </form>
+</div>
+
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Confirm Account Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete your account? We are sad to see you go but this is you final warning that you will not be able to reenter your account. Thank you for shopping with us!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="deleteUser();">Delete Account</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -77,3 +103,5 @@
         border-radius: 32pt;
     }
 </style>
+
+<script src="~/scripts/main.js"></script>
