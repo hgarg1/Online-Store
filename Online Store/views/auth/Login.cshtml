@@ -9,11 +9,14 @@
 @model Online_Store.pagemodels.Login;
 <div class="container mt-5">
 
-    <p class="text-danger d-inline">@Model.message @{
-        if(Model.message.IndexOf("email") != -1){
-           <span style="color: black;">Click <a href="/Email?success=false&message=3">here.</a></span>
+    <p class="text-danger d-inline">
+        @Model.message
+        @{
+            if (Model.message.IndexOf("email") != -1)
+            {
+                <span style="color: black;">Click <a href="/Email?success=false&message=3">here.</a></span>
+            }
         }
-    }
     </p>
     <h1>Login to Your Online Store</h1>
     <form action="/Auth/Login" method="post" autocomplete="on">
@@ -29,20 +32,38 @@
         <p>Don't have an account? Make one <a href="/Signup">here</a>.</p>
         <div class="mt-2 mb-2"></div>
         <p>Forgot Password? Reset it <a href="/ForgotPassword">here</a>.</p>
+        @{
+            if (Model.message.IndexOf("respective") != -1)
+            {
+                <div class="mt-2 mb-2"></div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="account" id="UserAccountCheck" value="User" checked>
+                    <label class="form-check-label" for="UserAccountCheck">
+                        User Account
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="account" id="AdminAccountCheck" value="Admin">
+                    <label class="form-check-label" for="AdminAccountCheck">
+                        Admin Account
+                    </label>
+                </div>
+            }
+        }
     </form>
 </div>
 
 <style>
 
-    body{
+    body {
         background-color: aquamarine;
     }
 
-    p{
-        font-weight:bold;
+    p {
+        font-weight: bold;
     }
 
-    .container{
+    .container {
         background-color: white;
         border-radius: 2%;
         border: groove;

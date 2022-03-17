@@ -90,7 +90,7 @@ function deleteUser() {
         url: "/User/Delete",
         method: "POST",
         success: function (data, status, jqXHR) {
-            window.location.assign("/Login");
+            window.location.assign(data);
         }
     });
 }

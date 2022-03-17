@@ -5,5 +5,6 @@
         public string username { get; set; }
         public string? password { get; set; }
         public string? lastLogin { get; set; }
+        public string? account { get; set; }
     }
 }

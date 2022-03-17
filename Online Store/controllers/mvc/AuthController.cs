@@ -32,6 +32,10 @@ namespace Online_Store.controllers.mvc
                         {
                             Login model = new Login("Email Verification Sent! Please verify and try logging in again. Need to change your email?");
                             return View(model);
+                        }else if (messageCallback.Equals("choose"))
+                        {
+                            Login model = new Login("You have a user account and an admin account please click the respective link to choose which one to login into.");
+                            return View(model);
                         }
                     }
                     else
@@ -57,7 +61,7 @@ namespace Online_Store.controllers.mvc
             if (auth.isValid(HttpContext.Session.GetString("user")))
             {
                 User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"));
-                return RedirectToAction("GetLogin", "Auth", new Binders.UserLogin() { username = user.email, password = user.password });
+                return RedirectToAction("GetLogin", "Auth", new Binders.UserLogin() { username = user.email, password = user.password, account  = user.role });
             }
             return View(new Login(""));
         }

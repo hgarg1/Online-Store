@@ -54,10 +54,8 @@ namespace Online_Store.Filters
 
             if(_user == null ) { return false; }
 
-
-            IEnumerable<User> users = sqlConnection.Query<User>("select * from [user] where email = @email and password = @password", _user);
+            IEnumerable<User> users = sqlConnection.Query<User>("select * from [user] where email = @email and password = @password and Role=@Role", _user);
             sqlConnection.Close();
-            Console.WriteLine(users);
             if(users.Count() == 0) 
             { 
                 return false;
@@ -65,8 +63,6 @@ namespace Online_Store.Filters
             else
             {
                 User? foundUser = users.FirstOrDefault();
-                Console.WriteLine(foundUser);
-                Console.WriteLine(_user);
                 if (foundUser == null) { return false;}
 
 

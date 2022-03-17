@@ -46,7 +46,7 @@ namespace Online_Store.controllers.api
         }
 
         [HttpPost("[action]")]
-        public void Delete()
+        public String Delete()
         {
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
@@ -59,7 +59,7 @@ namespace Online_Store.controllers.api
             sqlConnection.Close();
 
             HttpContext.Session.Clear();
-            Response.Redirect("/Login");
+            return "/Login";    
         }
     }
 }

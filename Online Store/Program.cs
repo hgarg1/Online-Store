@@ -2,10 +2,13 @@ using Online_Store.Filters;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<AuthFilter>();
+});
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiFilter>();
 });
 builder.Services.AddCors();
 builder.Services.AddMvc();
