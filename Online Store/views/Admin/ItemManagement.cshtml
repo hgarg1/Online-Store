@@ -1,0 +1,142 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/views/_AdminLayout.cshtml";
+    ViewBag.Title = "Items | Store";
+}
+<table id="ItemTable" class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">
+                #
+            </th>
+            <th scope="col">
+                Name
+            </th>
+            <th scope="col">
+                Price
+            </th>
+            <th scope="col">
+                Quantity Left
+            </th>
+            <th scope="col">
+                Supplier
+            </th>
+            <th scope="col">
+                Edit/View/Delete
+            </th>
+        </tr>
+    </thead>
+    <tbody id="TableBody">
+    </tbody>
+</table>
+<button class="btn btn-success" onclick="$('#AddItemModal').modal('show');"><span style="font-weight: bold">+</span> Add Item</button>
+<button class="btn btn-danger" onclick="ItemManagement.DeleteItemAll();"><span style="font-weight: bold">-</span> Delete ALL Items</button>
+
+<div class="modal fade" id="DeleteItemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Confirm Item Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this item? Users will no longer be able to purchase this item and will disappear from the client end immediately.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="ItemManagement.RequestDeleteItem();">Delete Item</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ViewItemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Detailed Item View</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="AddItemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add an Item</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h1 class="text-center text-warning">Want to add a new item? This is where you do it.</h1>
+                <form method="post" action="/Admin/Item/AddItem">
+
+                    <div class="form-group">
+                        <label for="Name">Official Name</label>
+                        <input class="form-control" name="name" id="Name" type="text" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Price">Price per Quantity</label>
+                        <input class="form-control" name="price" id="Price" type="text" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Quantity">Intial Quantity in Stock</label>
+                        <input class="form-control" name="quantity" id="Quantity" type="number" min=0 required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Supplier">Supplier</label>
+                        <input class="form-control" name="supplier" id="Suppler" type="text" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="ItemPicture">Image File</label>
+                        <input class="form-control" name="itemPicture" id="ItemPicture" type="file" accept="image/*" multiple required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Category">Category</label>
+                        <select class="form-control" name="category" id="Category" required>
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="Color">Color (Major)</label>
+                        <input class="form-control" name="color" id="Color" type="text" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Width">Width: Feet' Inches''</label>
+                        <input class="form-control" name="width" id="Width" type="text" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Height">Height: Feet' Inches''</label>
+                        <input class="form-control" name="weight" id="Height" type="text" required/>
+                    </div>
+                    <div class="form-group">
+                        <label for="Description">Description</label>
+                        <textarea cols="50" rows="10" style="resize: none;" class="form-control" name="description" id="Description" type="text" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Notes">Notes (Only seen by other Admins)</label>
+                        <textarea cols="50" rows="10" style="resize: none;" class="form-control" name="notes" id="Notes" type="text" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success" onclick="ItemManagement.AddItem();">Add Item</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/scripts/Admin/ItemManagement.js"></script>

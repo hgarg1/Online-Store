@@ -1,32 +1,106 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model Online_Store.pagemodels.Settings;
 @{
     ViewBag.Title = "Home | Admin";
     Layout = "~/views/_AdminLayout.cshtml";
+    ViewBag.Role = Model.role;
 }
-<style type="text/css">
-    body, html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-    }
+<div class="container mt-5 pb-2">
+    <h1 class="text-warning text-center">Neeed to update your information?<br /> Here is the place to do it.</h1>
+    <form class="d-grid" method="post" action="/User/Update">
 
-    
-    footer{
-        display: none;
-    }
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="inputFName">FirstName</label>
+                <input type="text" class="form-control" id="inputFName" name="firstName" placeholder=@Model.firstName value=@Model.firstName required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputLName">LastName</label>
+                <input type="text" class="form-control" id="inputLName" name="lastName" placeholder=@Model.lastName value=@Model.lastName required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-6">
+                <label for="inputEmail4">Email</label>
+                <input type="email" class="form-control" id="inputEmail4" name="email" placeholder=@Model.email value=@Model.email required>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="inputPassword4">Password</label>
+                <input type="password" class="form-control" id="inputPassword4" name="password" placeholder=@Model.password required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="inputAddress">Address</label>
+                <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.address" value="@Model.address" required>
+            </div>
+        </div>
 
-    #Content {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        top: 7%;
-    }
-
-</style>
-<div id="Content">
-    <iframe width="100%" height="100%" frameborder="0" src="/Settings"></iframe>
+        <div class="row">
+            <div class="form-group col-md-4">
+                <label for="inputAge">Age</label>
+                <input type="number" class="form-control" id="inputAge" name="age" placeholder=@Model.age value=@Model.age required>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputState">Gender</label>
+                <input type="text" class="form-control" id="inputGender" name="sex" placeholder="@Model.sex" value=@Model.sex required>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="inputState">Ethnicity</label>
+                <input type="text" class="form-control" id="inputEthnicity" name="ethnicity" placeholder="@Model.ethnicity" value="@Model.ethnicity" required>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-12">
+                <label for="lastLogin">Last Login</label>
+                <input type="text" class="form-control" id="lastLogin" readonly value="@Model.lastLogin">
+            </div>
+        </div>
+        <div class="w-100 pt-2 pb-2"></div>
+        <button type="submit" class="btn btn-primary col-md-12">Change Info</button>
+    </form>
+    <div class="pt-2 pb-2 w-100"></div>
+    <form id="DeleteUserForm" class="d-grid">
+        <button type="submit" class="btn btn-danger col-md-12">Delete Account</button>
+    </form>
 </div>
+
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Confirm Account Deletion</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete your account? We are sad to see you go but this is you final warning that you will not be able to reenter your account. Thank you for shopping with us!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" onclick="deleteUser();">Delete Account</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-image: url("https://cdn.wallpapersafari.com/9/57/R9gJsu.jpg");
+        background-size: cover;
+    }
+
+    label {
+        color: green;
+    }
+
+    .container {
+        background-color: whitesmoke;
+        border-radius: 32pt;
+    }
+</style>
+
+<script src="~/scripts/Admin/main.js"></script>

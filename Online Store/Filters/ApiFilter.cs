@@ -15,7 +15,25 @@ public class ApiFilter : IActionFilter
 
     public void OnActionExecuting(ActionExecutingContext context)
     {
-        // Do something before the action executes.
+        if(context.HttpContext.Session.GetString("user") == null)
+        {
+            return;
+        }
+
+        User user = JsonSerializer.Deserialize<User>(context.HttpContext.Session.GetString("user"));
+        if (user == null)
+        {
+            context.Result = new RedirectResult("/Login");
+        }
+
+        string reqApiUrl = context.HttpContext.Request.Path;
+        if(reqApiUrl.IndexOf("Admin") != -1)
+        {
+            if (user.role.Equals("User"))
+            {
+                context.Result = new RedirectResult("/Login");
+            }
+        }
     }
 
     public void OnActionExecuted(ActionExecutedContext context){}

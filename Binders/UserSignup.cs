@@ -18,5 +18,6 @@ namespace Binders
         public string sex { get; set; }
         public int age { get; set; }
         public string ethnicity { get; set; }
+        public string role { get; set; }
     }
 }
