@@ -71,20 +71,30 @@ namespace Online_Store.controllers.api
                 imagesString += (item.name + "_" + file.FileName) + ";";
             }
 
-            sqlConnection.Execute("exec dbo.os_sp_addItem @name, '" + imagesString + "', @price, @quantity, @supplier, @width, @height, @category, @color, @description, @notes;", new
+            try
             {
-                @name = item.name,
-                @description = item.description,
-                @price = item.Price,
-                @quantity = item.Quantity,
-                @supplier = item.supplier,
-                @width = item.width,
-                @height = item.height,
-                @category = item.category,
-                @color = item.color,
-                @notes = item.notes,
-            });
-            sqlConnection.Close();
+                sqlConnection.Execute("exec dbo.os_sp_addItem @name, '" + imagesString + "', @price, @quantity, @supplier, @width, @height, @category, @color, @description, @notes;", new
+                {
+                    @name = item.name,
+                    @description = item.description,
+                    @price = item.Price,
+                    @quantity = item.Quantity,
+                    @supplier = item.supplier,
+                    @width = item.width,
+                    @height = item.height,
+                    @category = item.category,
+                    @color = item.color,
+                    @notes = item.notes,
+                });
+            }catch(SqlException e)
+            {
+               Response.Redirect("/Admin/ItemManagement?success=false");
+            }
+            finally
+            {
+                sqlConnection.Close();
+            }
+
             Response.Redirect("/Admin/ItemManagement?success=true");
         }
     }
