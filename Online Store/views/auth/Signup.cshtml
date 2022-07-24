@@ -25,14 +25,14 @@
                                     {
                                         <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-success">@Model.Message</p>
 
-                                        if(!@Model.Message.Equals(""))
+                                        if (!@Model.Message.Equals(""))
                                         {
                                             <button onclick="window.location.assign('/Email?success=false&message=3')" class="btn btn-primary">Change Email & Reverify</button>
                                         }
                                     }
                                 }
                                 <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4 text-success">Sign up</p>
-                                <form class="mx-1 mx-md-4" action="/Auth/Signup" method="post">
+                                <form enctype="multipart/form-data" class="mx-1 mx-md-4" action="/Auth/Signup" method="post">
 
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <i class="fas fa-user fa-lg me-3 fa-fw"></i>
@@ -90,16 +90,27 @@
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <i class="fas fa-key fa-lg me-3 fa-fw"></i>
                                         <div class="form-outline flex-fill mb-0">
-                                            <input type="text" id="form3Example7cd" class="form-control" name="sex" autocomplete="sex" required />
-                                            <label class="form-label" for="form3Example7cd">Gender (Sex)</label>
+                                            <select id="inputGender" class="form-select form-control" required name="sex">
+                                            </select>
+                                            <label for="inputGender" class="form-label">Gender</label>
                                         </div>
                                     </div>
 
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <i class="fas fa-key fa-lg me-3 fa-fw"></i>
                                         <div class="form-outline flex-fill mb-0">
-                                            <input type="text" id="form3Example8cd" class="form-control" name="ethnicity" autocomplete="ethnicity" required />
-                                            <label class="form-label" for="form3Example8cd">Ethnicity/Race</label>
+
+                                            <select id="inputEthnicity" class="form-select form-control" required name="ethnicity" autocomplete="ethnicity">
+                                            </select>
+                                            <label for="inputEthnicity" class="form-label">Ethnicity</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-key fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input type="file" id="form3Example9cd" class="form-control" name="userProfilePicture" required />
+                                            <label class="form-label" for="form3Example9cd">User Profile Picture</label>
                                         </div>
                                     </div>
 
@@ -111,11 +122,11 @@
                                     </div>
 
                                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                        <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                                        <button type="submit" class="btn btn-primary w-100">Register</button>
                                     </div>
 
                                     <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                                        <button type="button" class="btn btn-danger btn-lg" onclick="window.location.assign('/Login')">Login</button>
+                                        <button type="button" class="btn btn-danger w-100" onclick="window.location.assign('/Login')">Login</button>
                                     </div>
                                 </form>
                             </div>
@@ -130,3 +141,33 @@
         </div>
     </div>
 </section>
+<script>
+    $("#form3Example9cd").change(function(event){
+        console.log(URL.createObjectURL(this.files[0]));
+        $(".img-fluid").attr("src",URL.createObjectURL(this.files[0]))
+    });
+
+    $.ajax({
+
+        url:"/User/GetGenders",
+        method:"GET",
+        success: function(data, status, jqXHR){
+
+            $.each(data, function(index, gender){
+                $(`<option value="${gender.gender}">${gender.gender}</option>`).appendTo($("#inputGender"));
+            });
+        }
+    });
+
+     $.ajax({
+
+        url:"/User/GetEthnicities",
+        method:"GET",
+        success: function(data, status, jqXHR){
+
+            $.each(data, function(index, gender){
+                $(`<option value="${gender.ethnicity}">${gender.ethnicity}</option>`).appendTo($("#inputEthnicity"));
+            });
+        }
+    });
+</script>

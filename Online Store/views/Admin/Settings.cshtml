@@ -5,59 +5,70 @@
 @{
     ViewBag.Title = "Home | Admin";
     Layout = "~/views/_AdminLayout.cshtml";
-    ViewBag.Role = Model.role;
+    ViewBag.Role = Model.Role;
 }
 <div class="container mt-5 pb-2">
+    @{
+        String imageUrl = "https://archieonlinestore.blob.core.windows.net/userprofileimages/" + @Model.Email + "_ProfilePicture.image";
+        <img src=@imageUrl width="250" height="250" class="d-block mx-auto" id="UserProfileImage" />
+    }
     <h1 class="text-warning text-center">Neeed to update your information?<br /> Here is the place to do it.</h1>
     <form class="d-grid" method="post" action="/User/Update">
 
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="inputFName">FirstName</label>
-                <input type="text" class="form-control" id="inputFName" name="firstName" placeholder=@Model.firstName value=@Model.firstName required>
+                <input type="text" class="form-control" id="inputFName" name="firstName" placeholder=@Model.FirstName value=@Model.FirstName required>
             </div>
             <div class="form-group col-md-6">
                 <label for="inputLName">LastName</label>
-                <input type="text" class="form-control" id="inputLName" name="lastName" placeholder=@Model.lastName value=@Model.lastName required>
+                <input type="text" class="form-control" id="inputLName" name="lastName" placeholder=@Model.LastName value=@Model.LastName required>
             </div>
         </div>
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="inputEmail4">Email</label>
-                <input type="email" class="form-control" id="inputEmail4" name="email" placeholder=@Model.email value=@Model.email required>
+                <input type="email" class="form-control" id="inputEmail4" name="email" placeholder=@Model.Email value="@Model.Email" autocomplete="username" required>
             </div>
             <div class="form-group col-md-6">
                 <label for="inputPassword4">Password</label>
-                <input type="password" class="form-control" id="inputPassword4" name="password" placeholder=@Model.password required>
+                <input type="password" class="form-control" id="inputPassword4" name="password" placeholder="@Model.Password" autocomplete="current-password" required>
             </div>
         </div>
         <div class="row">
             <div class="form-group col-md-12">
                 <label for="inputAddress">Address</label>
-                <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.address" value="@Model.address" required>
+                <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.Address" value="@Model.Address" required>
             </div>
         </div>
 
         <div class="row">
             <div class="form-group col-md-4">
                 <label for="inputAge">Age</label>
-                <input type="number" class="form-control" id="inputAge" name="age" placeholder=@Model.age value=@Model.age required>
+                <input type="number" class="form-control" id="inputAge" name="age" placeholder=@Model.Age value=@Model.Age required>
             </div>
             <div class="form-group col-md-4">
-                <label for="inputState">Gender</label>
-                <input type="text" class="form-control" id="inputGender" name="sex" placeholder="@Model.sex" value=@Model.sex required>
+                <label for="inputGender">Gender</label>
+                <select id="inputGender" class="form-select" required name="sex">
+                </select>
             </div>
             <div class="form-group col-md-4">
                 <label for="inputState">Ethnicity</label>
-                <input type="text" class="form-control" id="inputEthnicity" name="ethnicity" placeholder="@Model.ethnicity" value="@Model.ethnicity" required>
+                <input type="text" class="form-control" id="inputEthnicity" name="ethnicity" placeholder="@Model.Ethnicity" value="@Model.Ethnicity" required>
             </div>
         </div>
         <div class="row">
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-6">
                 <label for="lastLogin">Last Login</label>
-                <input type="text" class="form-control" id="lastLogin" readonly value="@Model.lastLogin">
+                <input type="text" class="form-control" id="lastLogin" readonly value="@Model.LastLogin" placeholder="@Model.LastLogin">
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="newUserProfileImage">New User Profile Image</label>
+                <input type="file" name="userProfileImage" class="form-control" id="newUserProfileImage" readonly>
             </div>
         </div>
+        <input type="hidden" id="userRole" readonly name="role_name" value="Admin">
         <div class="w-100 pt-2 pb-2"></div>
         <button type="submit" class="btn btn-primary col-md-12">Change Info</button>
     </form>
@@ -101,6 +112,36 @@
         background-color: whitesmoke;
         border-radius: 32pt;
     }
+
+    #UserProfileImage {
+        border: 0.5rem solid black;
+    }
 </style>
 
-<script src="~/scripts/Admin/main.js"></script>
+<script>
+
+    $.ajax({
+
+        url: "/User/GetGenders",
+        method: "GET",
+        success: function (data, status, jqXHR) {
+
+            $.each(data, function (index, gender) {
+                $(`<option value="${gender.id}">${gender.gender}</option>`).appendTo($("#inputGender"));
+            });
+                    $("#inputGender").val("@Model.Sex");
+        }
+    });
+    $.ajax({
+
+        url: "/User/GetEthnicities",
+        method: "GET",
+        success: function (data, status, jqXHR) {
+
+            $.each(data, function (index, gender) {
+                $(`<option value="${gender.id}">${gender.ethnicity}</option>`).appendTo($("#inputEthnicity"));
+            });
+            $("#inputEthnicity").val("@Model.Ethnicity");
+        }
+    });
+</script>

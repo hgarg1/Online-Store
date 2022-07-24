@@ -5,6 +5,13 @@
     Layout = "~/views/_AdminLayout.cshtml";
     ViewBag.Title = "Items | Store";
 }
+<style>
+    label::after {
+        content: " *";
+        font-weight: bold;
+        color: red;
+    }
+</style>
 <table id="ItemTable" class="table table-striped">
     <thead>
         <tr>
@@ -31,6 +38,15 @@
     <tbody id="TableBody">
     </tbody>
 </table>
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">Next</a></li>
+    </ul>
+</nav>
 <button class="btn btn-success" onclick="$('#AddItemModal').modal('show');"><span style="font-weight: bold">+</span> Add Item</button>
 <button class="btn btn-danger" onclick="ItemManagement.DeleteItemAll();"><span style="font-weight: bold">-</span> Delete ALL Items</button>
 
@@ -39,7 +55,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">Confirm Item Deletion</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -48,7 +64,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" onclick="ItemManagement.RequestDeleteItem();">Delete Item</button>
+                <button type="button" class="btn btn-danger" onclick="ItemManagement.RequestDeleteItem();">Delete Items</button>
             </div>
         </div>
     </div>
@@ -81,27 +97,27 @@
             </div>
             <div class="modal-body">
                 <h1 class="text-center text-warning">Want to add a new item? This is where you do it.</h1>
-                <form method="post" action="/Admin/Item/AddItem">
+                <form enctype="multipart/form-data" method="post" action="/Item/AddItem">
 
                     <div class="form-group">
                         <label for="Name">Official Name</label>
-                        <input class="form-control" name="name" id="Name" type="text" required/>
+                        <input class="form-control" name="name" id="Name" type="text" required />
                     </div>
                     <div class="form-group">
                         <label for="Price">Price per Quantity</label>
-                        <input class="form-control" name="price" id="Price" type="text" required/>
+                        <input class="form-control" name="price" id="Price" type="text" required />
                     </div>
                     <div class="form-group">
                         <label for="Quantity">Intial Quantity in Stock</label>
-                        <input class="form-control" name="quantity" id="Quantity" type="number" min=0 required/>
+                        <input class="form-control" name="quantity" id="Quantity" type="number" min=0 required />
                     </div>
                     <div class="form-group">
                         <label for="Supplier">Supplier</label>
-                        <input class="form-control" name="supplier" id="Suppler" type="text" required/>
+                        <input class="form-control" name="supplier" id="Suppler" type="text" required />
                     </div>
                     <div class="form-group">
                         <label for="ItemPicture">Image File</label>
-                        <input class="form-control" name="itemPicture" id="ItemPicture" type="file" accept="image/*" multiple required/>
+                        <input class="form-control" name="images" id="ItemPicture" type="file" accept="image/*" multiple required />
                     </div>
                     <div class="form-group">
                         <label for="Category">Category</label>
@@ -111,15 +127,15 @@
                     </div>
                     <div class="form-group">
                         <label for="Color">Color (Major)</label>
-                        <input class="form-control" name="color" id="Color" type="text" required/>
+                        <input class="form-control" name="color" id="Color" type="text" required />
                     </div>
                     <div class="form-group">
-                        <label for="Width">Width: Feet' Inches''</label>
-                        <input class="form-control" name="width" id="Width" type="text" required/>
+                        <label for="Width">Width: Feet' Inches'' (0 if not needed)</label>
+                        <input class="form-control" name="width" id="Width" type="text" required />
                     </div>
                     <div class="form-group">
-                        <label for="Height">Height: Feet' Inches''</label>
-                        <input class="form-control" name="weight" id="Height" type="text" required/>
+                        <label for="Height">Height: Feet' Inches'' (0 if not needed)</label>
+                        <input class="form-control" name="weight" id="Height" type="text" required />
                     </div>
                     <div class="form-group">
                         <label for="Description">Description</label>
@@ -130,7 +146,7 @@
                         <label for="Notes">Notes (Only seen by other Admins)</label>
                         <textarea cols="50" rows="10" style="resize: none;" class="form-control" name="notes" id="Notes" type="text" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-success" onclick="ItemManagement.AddItem();">Add Item</button>
+                    <button type="submit" class="btn btn-success">Add Item</button>
                 </form>
             </div>
             <div class="modal-footer">
@@ -139,4 +155,36 @@
         </div>
     </div>
 </div>
-<script src="~/scripts/Admin/ItemManagement.js"></script>
+<div class="modal fade" id="AddItemSuccessModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modael-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="~/scripts/Admin/ItemManagement.js"></script>

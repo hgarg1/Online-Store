@@ -1,71 +1,103 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model Online_Store.pagemodels.Settings;
 @{
     ViewBag.Title = "Store | Online";
     Layout = "~/views/_Layout.cshtml";
+    ViewBag.Role = Model.Role;
 }
 
-@model Online_Store.pagemodels.Settings;
+@{
+    if (Model == null)
+    {
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-danger text-center">MODEL IS NULL!!!</p>
+        return;
+    }
+    if (Model.error)
+    {
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-danger text-center">@Model.Message</p>
+    }
+    else if (Model.Message != null || Model.Message.Equals(""))
+    {
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-success text-center">@Model.Message</p>
+    }
+}
+
 
 <div class="container mt-5 pb-2">
+    @{
+        String imageUrl = "https://archieonlinestore.blob.core.windows.net/userprofileimages/" + @Model.Email + "_ProfilePicture.image";
+        <img src=@imageUrl width="250" height="250" class="d-block mx-auto my-2" id="UserProfileImage" />
+    }
     <h1 class="text-warning text-center">Neeed to update your information?<br /> Here is the place to do it.</h1>
-    <form class="d-grid" method="post" action="/User/Update">
+    <form class="d-grid" enctype="multipart/form-data" method="post" action="/User/Update">
 
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="inputFName">FirstName</label>
-                <input type="text" class="form-control" id="inputFName" name="firstName" placeholder=@Model.firstName value=@Model.firstName required>
+                <input type="text" class="form-control" id="inputFName" name="firstName" placeholder=@Model.FirstName value=@Model.FirstName required>
             </div>
             <div class="form-group col-md-6">
                 <label for="inputLName">LastName</label>
-                <input type="text" class="form-control" id="inputLName" name="lastName" placeholder=@Model.lastName value=@Model.lastName required>
+                <input type="text" class="form-control" id="inputLName" name="lastName" placeholder=@Model.LastName value=@Model.LastName required>
             </div>
         </div>
         <div class="row">
             <div class="form-group col-md-6">
                 <label for="inputEmail4">Email</label>
-                <input type="email" class="form-control" id="inputEmail4" name="email" placeholder=@Model.email value=@Model.email required>
+                <input type="email" class="form-control" id="inputEmail4" name="email" placeholder="@Model.Email" value="@Model.Email" required>
             </div>
             <div class="form-group col-md-6">
                 <label for="inputPassword4">Password</label>
-                <input type="password" class="form-control" id="inputPassword4" name="password" placeholder=@Model.password required>
+                <input type="password" class="form-control" id="inputPassword4" name="password" placeholder="@Model.Password" required>
             </div>
         </div>
         <div class="row">
             <div class="form-group col-md-12">
                 <label for="inputAddress">Address</label>
-                <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.address" value="@Model.address" required>
+                <input type="text" class="form-control" id="inputAddress" name="address" placeholder="@Model.Address" value="@Model.Address" required>
             </div>
         </div>
 
         <div class="row">
             <div class="form-group col-md-4">
                 <label for="inputAge">Age</label>
-                <input type="number" class="form-control" id="inputAge" name="age" placeholder=@Model.age value=@Model.age required>
+                <input type="number" class="form-control" id="inputAge" name="age" placeholder=@Model.Age value=@Model.Age required>
             </div>
             <div class="form-group col-md-4">
-                <label for="inputState">Gender</label>
-                <input type="text" class="form-control" id="inputGender" name="sex" placeholder="@Model.sex" value=@Model.sex required>
+                <label for="inputGender">Gender</label>
+                <select id="inputGender" class="form-select" required name="sex">
+                </select>
             </div>
             <div class="form-group col-md-4">
-                <label for="inputState">Ethnicity</label>
-                <input type="text" class="form-control" id="inputEthnicity" name="ethnicity" placeholder="@Model.ethnicity" value="@Model.ethnicity" required>
+
+                <label for="inputEthnicity">Ethnicity</label>
+                <select id="inputEthnicity" class="form-select" required name="ethnicity">
+                </select>
             </div>
         </div>
         <div class="row">
-            <div class="form-group col-md-12">
+            <div class="form-group col-md-6">
                 <label for="lastLogin">Last Login</label>
-                <input type="text" class="form-control" id="lastLogin" readonly value="@Model.lastLogin">
+                <input type="text" class="form-control" id="lastLogin" name="lastLogin" value="@Model.LastLogin" placeholder="@Model.LastLogin" readonly>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="newUserProfileImage">New User Profile Image</label>
+                <input type="file" name="userProfileImage" class="form-control" id="newUserProfileImage" accept="image/*" readonly>
             </div>
         </div>
+        <input type="hidden" id="userRole" readonly name="role_name" value="User">
         <div class="w-100 pt-2 pb-2"></div>
         <button type="submit" class="btn btn-primary col-md-12">Change Info</button>
     </form>
     <div class="pt-2 pb-2 w-100"></div>
-    <form id="DeleteUserForm" class="d-grid">
-        <button type="submit" class="btn btn-danger col-md-12">Delete Account</button>
-    </form>
+    <div class="container">
+        <form id="DeleteUserForm" class="d-grid w-100">
+            <button type="submit" class="btn btn-danger px-5">Delete Account</button>
+        </form>
+    </div>
 </div>
 
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -73,7 +105,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">Confirm Account Deletion</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -81,7 +113,7 @@
                 Are you sure you want to delete your account? We are sad to see you go but this is you final warning that you will not be able to reenter your account. Thank you for shopping with us!
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-danger" onclick="deleteUser();">Delete Account</button>
             </div>
         </div>
@@ -102,6 +134,35 @@
         background-color: whitesmoke;
         border-radius: 32pt;
     }
-</style>
 
-<script src="~/scripts/main.js"></script>
+    #UserProfileImage {
+        border: 0.5rem solid black;
+    }
+</style>
+<script>
+
+    $.ajax({
+
+        url: "/User/GetGenders",
+        method: "GET",
+        success: function (data, status, jqXHR) {
+
+            $.each(data, function (index, gender) {
+                $(`<option value="${gender.id}">${gender.gender}</option>`).appendTo($("#inputGender"));
+            });
+                    $("#inputGender").val("@Model.Sex");
+        }
+    });
+    $.ajax({
+
+        url: "/User/GetEthnicities",
+        method: "GET",
+        success: function (data, status, jqXHR) {
+
+            $.each(data, function (index, gender) {
+                $(`<option value="${gender.id}">${gender.ethnicity}</option>`).appendTo($("#inputEthnicity"));
+            });
+            $("#inputEthnicity").val("@Model.Ethnicity");
+        }
+    });
+</script>

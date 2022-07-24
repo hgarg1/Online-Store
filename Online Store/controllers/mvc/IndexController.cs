@@ -55,11 +55,25 @@ namespace Online_Store.controllers.mvc
 
                 if (String.Equals(successCallback, "false"))
                 {
-                    return View(new Contact { IsSuccess = false, Message = "Something Wrong Happened Please Try Again!"});
+
+                    StringValues messageCallbback = new StringValues();
+                    if (Request.Query.TryGetValue("message", out messageCallbback))
+                    {
+                        if (String.Equals(messageCallbback, "0"))
+                        {
+                            pagemodels.Contact model = new pagemodels.Contact() { IsSuccess = false, Message = "User Session Expired, please close and reopen tab" };
+                            return View(model);
+                        }
+                    }
+                    else
+                    {
+                        return View(new Contact { IsSuccess = false, Message = "Something Wrong Happened Please Try Again!" });
+                    }
+
                 }
-                else if(String.Equals(successCallback, "true"))
+                else if (String.Equals(successCallback, "true"))
                 {
-                    return View(new Contact {  Message = "Success! Email sent to recipient." });
+                    return View(new Contact { Message = "Success! Email sent to recipient." });
                 }
             }
             return View(new Contact { IsSuccess = null, Message = "" });
@@ -68,8 +82,37 @@ namespace Online_Store.controllers.mvc
         [HttpGet("[action]")]
         public IActionResult Settings()
         {
+
+            StringValues successCallback = new StringValues();
+            if (Request.Query.TryGetValue("success", out successCallback))
+            {
+                if (String.Equals(successCallback, "false"))
+                {
+                    StringValues messageCallbback = new StringValues();
+                    if (Request.Query.TryGetValue("message", out messageCallbback))
+                    {
+                        if (String.Equals(messageCallbback, "0"))
+                        {
+
+                            pagemodels.Settings settingsModel = JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user"));
+                            settingsModel.error = true;
+                            settingsModel.Message = "User Session Expired, please close and reopen tab";
+                            return View(settingsModel);
+                        }
+                    }
+                }
+                else if (String.Equals(successCallback, "true"))
+                {
+                    pagemodels.Settings settingsModel = JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user"));
+                    settingsModel.error = false;
+                    settingsModel.Message = "" ;
+                    return View(settingsModel);
+                }
+            }
             Settings model = JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user"));
             model.IsActive = true;
+            model.error = false;
+            model.Message = "";
             return View(model);
         }
     }

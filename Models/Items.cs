@@ -13,7 +13,12 @@ namespace Models
         public float Price { get; set; }
         public int Quantity { get; set; }
         public string Supplier { get; set; }
-        public int? characteristic_fk { get; set; }
-        public string name { get; set; }
+        public string? name { get; set; }
+        public string? width { get; set; }
+        public string? color { get; set; }
+        public string? height { get; set; }
+        public string? category { get; set; }
+        public string? description { get; set; }
+        public string notes { get; set; }
     }
 }

@@ -1,3 +1,20 @@
 ﻿footer {
     background-color: white;
 }
+
+
+.card {
+    min-width: 250px;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 1%;
+    margin-bottom: 1%;
+}
+
+    .card:hover {
+        transform: scale(1.025);
+    }
+
+form {
+    justify-content: space-around;
+}   

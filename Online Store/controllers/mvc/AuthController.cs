@@ -61,7 +61,7 @@ namespace Online_Store.controllers.mvc
             if (auth.isValid(HttpContext.Session.GetString("user")))
             {
                 User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"));
-                return RedirectToAction("GetLogin", "Auth", new Binders.UserLogin() { username = user.email, password = user.password, account  = user.role });
+                return RedirectToAction("Login", "Auth", new Binders.UserLogin() { username = user.Email, password = user.Password, role  = user.Role });
             }
             return View(new Login(""));
         }

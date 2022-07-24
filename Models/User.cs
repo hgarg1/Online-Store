@@ -1,52 +1,49 @@
 ﻿using Binders;
+using System;
+using System.Collections.Generic;
+
 namespace Models
 {
-    public class User //used when we pull data from a table so we can access data like a normal object
+    public partial class User
     {
-        public string? firstName { get; set; }
-        public string? lastName { get; set; }
-        public string? email { get; set; }
-        public string? lastLogin { get; set; }
-        public string? password { get; set; }
-        public string? address { get; set; }
-        public int age { get; set; }
-        public string? sex { get; set; }
-        public int id { get; set; }
-        public string? emailVerified { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string Email { get; set; } = null!;
+        public string? LastLogin { get; set; }
+        public string? Password { get; set; }
+        public string? Address { get; set; }
+        public int Id { get; set; }
+        public int Age { get; set; }
+        public string? EmailVerified { get; set; }
+        public int? Role { get; set; }
+        public int? Sex { get; set; }
+        public int? Ethnicity { get; set; }
 
-        public string? emailOld { get; set; }
-        public string? ethnicity { get; set; }
-        public string? role { get; set; }
+        public virtual Ethnicity? EthnicityNavigation { get; set; }
+        public virtual Role? RoleNavigation { get; set; }
+        public virtual Gender? SexNavigation { get; set; }
 
-        public override bool Equals(object? obj) //able to handle table to table checks and table to binder checks too
+        public override bool Equals(object? obj)
         {
-            if (obj is Binders.UserLogin)
-            {
-                return String.Equals(email, ((Binders.UserLogin)obj).username) && String.Equals(password, ((Binders.UserLogin)obj).password);
-            }
-            else if (obj is Models.User)
-            {
-                return String.Equals(email, ((Models.User)obj).email)
-                    && String.Equals(password, ((Models.User)obj).password)
-                    && String.Equals(firstName, ((Models.User)obj).firstName)
-                    && String.Equals(lastName, ((Models.User)obj).lastName)
-                    && String.Equals(address, ((Models.User)obj).address)
-                    && String.Equals($"{age}", $"{((Models.User)obj).age}")
-                    && String.Equals($"{id}", $"{((Models.User)obj).id}")
-                    && String.Equals($"{sex}", $"{((Models.User)obj).sex}")
-                    && String.Equals($"{emailOld}", $"{((Models.User)obj).emailOld}")
-                    && String.Equals($"{ethnicity}", $"{((Models.User)obj).ethnicity}")
-                    && String.Equals($"{role}", $"{((Models.User)obj).role}");
-            }
-            else
-            {
-                return false; //will never reach here
-            }
-        }
+            if(obj == null) return false;
 
-        public override String ToString()
-        {
-            return email + " " + password + " " + firstName + " " + lastName + " " + address + " " + age + " " + id + " " + sex + " " + emailOld + " " + ethnicity + " " + role;
+            if(obj is User)
+            {
+                User req = (User)obj;
+                return 
+                    req.FirstName.Equals(FirstName) && 
+                    req.LastName.Equals(LastName) && 
+                    req.Email.Equals(Email) && 
+                    req.LastLogin.Equals(LastLogin) && 
+                    req.Password.Equals(Password) && 
+                    req.Address.Equals(Address) && 
+                    req.EmailVerified.Equals(EmailVerified);
+            }else if(obj is UserLogin)
+            {
+                UserLogin req = (UserLogin)obj;
+                return Email.Equals(req.username) && Password.Equals(req.password);
+            }
+            return false;
         }
     }
 }

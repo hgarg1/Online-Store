@@ -82,6 +82,16 @@ function main(args) {
         event.preventDefault();
         $("#deleteUserModal").modal("show");
     });
+
+    $.ajax({
+        url: "/User/IsAdmin",
+        method: "GET",
+        success: function (data, status, jqXHR) {
+            if (data === true) {
+                $("<li class='nav-item'><a class='nav-link' href='/Admin/Index'>Admin View</a></li>").appendTo($(".navbar-nav"));
+            }
+        }
+    });
 }
 
 function deleteUser() {

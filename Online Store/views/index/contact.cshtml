@@ -1,12 +1,27 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@model Online_Store.pagemodels.Contact;
 @{
     ViewBag.Title = "Store | Online";
     Layout = "~/views/_Layout.cshtml";
 }
 
-@model Online_Store.pagemodels.Contact;
+@{
+    if (Model == null)
+    {
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-danger text-center">MODEL IS NULL!!!</p>
+        return;
+    }
+    if (Model.IsSuccess == false)
+    {
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-danger text-center">@Model.Message</p>
+    }
+    else if (Model.Message != null || Model.Message.Equals(""))
+    {
+        <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-success text-center">@Model.Message</p>
+    }
+}
 
 <link rel="stylesheet" type="text/css" href="/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="/fonts/Linearicons-Free-v1.0.0/icon-font.min.css">
@@ -97,4 +112,3 @@
 <script src="/vendor/countdowntime/countdowntime.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCeHMbzb7jOks7M0X3x7XAAmQNUv3N0JDY"></script>
 <script src="/scripts/map-custom.js"></script>
-<script src="/scripts/main.js"></script>

@@ -8,6 +8,12 @@
       "resourceId": null,
       "type": "mssql.onprem",
       "connectionId": "ConnectionStrings:SQL"
+    },
+    "storage1": {
+      "secretStore": "LocalSecretsFile",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/archieonlinestore",
+      "type": "storage.azure",
+      "connectionId": "Storage:AZBlob"
     }
   }
 }

@@ -7,7 +7,7 @@
 }
 
 @model Online_Store.pagemodels.Index;
-
+<link rel="stylesheet" href="~/styles/style.css" />
 @{
     if (Model == null)
     {
@@ -18,9 +18,44 @@
     {
         <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-danger text-center">@Model.Message</p>
     }
-    else
+    else if (Model.Message != null || Model.Message.Equals(""))
     {
         <p class="text-center fw-bold mb-5 mx-1 mx-md-4 mt-4 text-success text-center">@Model.Message</p>
     }
 }
-
+<h1 class="d-block mx-auto" style="color: gray;">Welcome to the Online Store!<br /><span style="font-size: smaller;">We're glad you're here and please take your time and have fun shopping with us.</span></h1>
+<div class="d-grid w-100"></div>
+<div class="modal fade container w-100" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemModalTitle"></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Home</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Profile</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-contact-tab" data-bs-toggle="pill" data-bs-target="#pills-contact" type="button" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</button>
+                    </li>
+                </ul>
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">1</div>
+                    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">2</div>
+                    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">3</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/scripts/ItemsPageBuilder.js" />

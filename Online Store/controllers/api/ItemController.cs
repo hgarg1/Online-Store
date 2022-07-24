@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Models;
 using Dapper;
+using System.Diagnostics;
+using Azure.Storage.Blobs;
+using Microsoft.EntityFrameworkCore;
 
 namespace Online_Store.controllers.api
 {
@@ -21,9 +24,10 @@ namespace Online_Store.controllers.api
         {
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
-            IEnumerable<Items> items = sqlConnection.Query<Items>("select * from [Items]");
+            IEnumerable<Items> items = sqlConnection.Query<Items>("exec dbo.os_sp_getItems;");
             sqlConnection.Close();
             return items;
+
         }
 
         [HttpDelete("/Admin/[Controller]/[Action]/{id}")]
@@ -43,6 +47,45 @@ namespace Online_Store.controllers.api
             IEnumerable<Category> categories = sqlConnection.Query<Category>("select * from [Categories]");
             sqlConnection.Close();
             return categories;
+        }
+
+        [HttpPost("[Action]")]
+        public void AddItem([FromForm] Binders.Item item)
+        {
+            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
+            if(sqlConnection.Execute("select * from [Items] where name = @name AND supplier = @supplier", item) == 1)
+            {
+                Response.Redirect("/Admin/ItemManagement?success=false&reason=exists");
+            }
+
+            String imagesString = "";
+            for (int i = 0; i < item.images.Length; i++)
+            {
+                Debug.WriteLine(item.images[i]);
+
+                IFormFile file = item.images[i];
+                BlobContainerClient container = new BlobContainerClient("DefaultEndpointsProtocol=https;AccountName=archieonlinestore;AccountKey=6+RID6LqA4+vqY9iG4kp+tmNQTVuHRYlz/QKkByWXMNxSLsecJvpf33rf2JmgfGiYzqkzMUJvS7E+AStv/qNNQ==;EndpointSuffix=core.windows.net", "images");
+                BlobClient client = container.GetBlobClient(item.name + "_" + file.FileName);
+                client.Upload(file.OpenReadStream(), true, default);
+
+                imagesString += (item.name + "_" + file.FileName) + ";";
+            }
+
+            sqlConnection.Execute("exec dbo.os_sp_addItem @name, '" + imagesString + "', @price, @quantity, @supplier, @width, @height, @category, @color, @description, @notes;", new
+            {
+                @name = item.name,
+                @description = item.description,
+                @price = item.Price,
+                @quantity = item.Quantity,
+                @supplier = item.supplier,
+                @width = item.width,
+                @height = item.height,
+                @category = item.category,
+                @color = item.color,
+                @notes = item.notes,
+            });
+            sqlConnection.Close();
+            Response.Redirect("/Admin/ItemManagement?success=true");
         }
     }
 }

@@ -5,6 +5,7 @@ using Dapper;
 using Models;
 using Microsoft.Data.SqlClient;
 using System.Text.Json;
+using System.Diagnostics;
 
 namespace Online_Store.Filters
 {
@@ -19,7 +20,6 @@ namespace Online_Store.Filters
         //before it reaches MVC controller
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            string? user = context.HttpContext.Session.GetString("user");
             //first part is list of whitelisted pages, do NOT black list but rather whitelist
             if (
                 (
@@ -33,10 +33,7 @@ namespace Online_Store.Filters
                 && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/ForgotPassword") == -1
                 ) 
                 && 
-                (
-                user == null 
-                || !isValid(user)
-                )
+                !isValid(context.HttpContext.Session.GetString("user"))
             )
             {
                 //context.Result = new FileStreamResult(fileStream: new FileStream("wwwroot/403.html", FileMode.Open), contentType: "text/html");
@@ -44,6 +41,9 @@ namespace Online_Store.Filters
             }
         }
 
+        /**
+         * <h1>validates cache as being authentic</h1>
+         */
         public bool isValid(string user)//used a lot, self explanatory
         {
             if(user == null || String.Equals(user, "")) { return false; } //precheck
@@ -54,7 +54,7 @@ namespace Online_Store.Filters
 
             if(_user == null ) { return false; }
 
-            IEnumerable<User> users = sqlConnection.Query<User>("select * from [user] where email = @email and password = @password and Role=@Role", _user);
+            IEnumerable<User> users = sqlConnection.Query<User>("exec os_sp_getUser @email, @password;", _user);
             sqlConnection.Close();
             if(users.Count() == 0) 
             { 
@@ -65,7 +65,7 @@ namespace Online_Store.Filters
                 User? foundUser = users.FirstOrDefault();
                 if (foundUser == null) { return false;}
 
-
+                
                 if (foundUser.Equals(_user))
                 {
                     return true;

@@ -7,7 +7,7 @@
 }
 
 @model Online_Store.pagemodels.Login;
-<div class="container mt-5">
+<div class="container d-block mx-auto my-5">
 
     <p class="text-danger d-inline">
         @Model.message
@@ -37,13 +37,13 @@
             {
                 <div class="mt-2 mb-2"></div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="account" id="UserAccountCheck" value="User" checked>
+                    <input class="form-check-input" type="radio" name="role" id="UserAccountCheck" value=5 checked>
                     <label class="form-check-label" for="UserAccountCheck">
                         User Account
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="account" id="AdminAccountCheck" value="Admin">
+                    <input class="form-check-input" type="radio" name="role" id="AdminAccountCheck" value=3>
                     <label class="form-check-label" for="AdminAccountCheck">
                         Admin Account
                     </label>
@@ -56,7 +56,8 @@
 <style>
 
     body {
-        background-color: aquamarine;
+        background-image: url("https://th.bing.com/th/id/R.3d69f18caaad6522769575ab2b5d63be?rik=Q37rWVm7we5kxA&riu=http%3a%2f%2fwallpapercave.com%2fwp%2fw2f6Opj.jpg&ehk=nxKropU92yETepG87TjSsa4q22OMd2LuTI4m2Pfmn9I%3d&risl=&pid=ImgRaw&r=0");
+        background-size: cover;
     }
 
     p {
