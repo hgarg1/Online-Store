@@ -17,7 +17,10 @@ namespace Online_Store.controllers.mvc
         [HttpGet("[action]")]
         public IActionResult Settings()
         {
-            return View(JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user")));
+            return View(JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            }));
         }
 
         [HttpGet("[action]")]

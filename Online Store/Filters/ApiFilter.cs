@@ -21,7 +21,10 @@ public class ApiFilter : IActionFilter
         {
             return;
         }
-        User? user = JsonSerializer.Deserialize<User>(context.HttpContext.Session.GetString("user"));
+        User? user = JsonSerializer.Deserialize<User>(context.HttpContext.Session.GetString("user"),new JsonSerializerOptions()
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+        });
         if (user == null)
         {
             context.Result = new RedirectResult("/Login");
@@ -36,7 +39,8 @@ public class ApiFilter : IActionFilter
 
         if(reqApiUrl.IndexOf("Admin") != -1)
         {
-            if (user.Role == RolesEnum.User)
+            OnlineStore ctx = new OnlineStore();
+            if (user.Role == ctx.Roles.Where(r => r.RoleName.Equals("User")).First().Id)
             {
                 context.Result = new RedirectResult("/Login");
             }

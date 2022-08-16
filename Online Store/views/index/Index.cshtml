@@ -1,12 +1,9 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-    ViewBag.Title = "Store | Online";
+﻿@{
     Layout = "~/views/_Layout.cshtml";
+    ViewBag.Title = "Store | Online";
+    @model Online_Store.pagemodels.Index;
 }
 
-@model Online_Store.pagemodels.Index;
 @{
     if (Model == null)
     {
@@ -23,7 +20,7 @@
     }
 }
 <h1 class="d-block mx-auto" style="color: gray;">Welcome to the Online Store!<br /><span style="font-size: smaller;">We're glad you're here and please take your time and have fun shopping with us.</span></h1>
-<div class="d-grid w-100"></div>
+<div class="d-grid w-100 justify-content-center"></div>
 <div class="modal fade container w-100" id="itemModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -57,4 +54,4 @@
         </div>
     </div>
 </div>
-<script src="~/scripts/ItemsPageBuilder.js" />
+<script src="~/scripts/ItemsPageBuilder.js" ></script>

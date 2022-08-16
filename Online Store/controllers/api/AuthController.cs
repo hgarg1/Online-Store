@@ -20,6 +20,7 @@ namespace Online_Store.controllers.api
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private OnlineStore ctx = new OnlineStore();
         private static Dictionary<string, string[]> userTokens = new Dictionary<string, string[]>();
 
         private IConfiguration _configuration;
@@ -33,15 +34,17 @@ namespace Online_Store.controllers.api
         {
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
-            IEnumerable<Models.User> users = sqlConnection.Query<Models.User>("exec os_sp_getUser @username, @password;", req);
-            if (users.Count() == 0)
+
+
+            Models.User? user = ctx.Users.Where(u=>u.Email.Equals(req.username) && u.Password.Equals(Encoding.ASCII.GetString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(req.password))))).FirstOrDefault();
+
+            if (user == null)
             {
                 Response.Redirect("/Login?success=false");
                 return;
             }
 
-            Models.User user = users.FirstOrDefault();
-            if (user.Role <= RolesEnum.Administrator)
+            if (user.Role <= ctx.Roles.Where(r => r.RoleName.Equals("Admnistrator")).First().Id)
             {
                 string redirectUrl = "";
                 if (req.role != null && req.role == 5) //on means the radio was checked
@@ -59,37 +62,40 @@ namespace Online_Store.controllers.api
                     return;
                 }
 
-                if (user.Equals(req) && user.EmailVerified.Equals("false"))
+                if (user.EmailVerified.Equals("false"))
                 {
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
-                    SendEmailValidation(req.username, true);
+                    SendEmailValidation(user.Email, true);
                     Response.Redirect("/Login?success=false&message=email");
                 }
-                else if (user.Equals(req) && user.EmailVerified.Equals("true"))
+                else if (user.EmailVerified.Equals("true"))
                 {
                     user.LastLogin = DateTime.Now.ToString();
-                    sqlConnection.Execute("update [user] set lastLogin = @LastLogin where email = @Email and password = @Password", user);
-                    sqlConnection.Close();
-                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));//set session object for authentication into restircted pages
+                    ctx.Update(user);
+                    ctx.SaveChanges();
+                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user, new JsonSerializerOptions()
+                    {
+                        ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+                    }));//set session object for authentication into restircted pages
                     Response.Redirect(redirectUrl);
                 }
                 sqlConnection.Close();
             }
             else
             {
-                if (user.Equals(req) && user.EmailVerified.Equals("true"))
+                if (user.EmailVerified.Equals("true"))
                 {
                     user.LastLogin = DateTime.Now.ToString();
-                    sqlConnection.Execute("update [user] set lastLogin = @LastLogin where email = @Email and password=@Password", user);
-                    sqlConnection.Close();
+                    ctx.Update(user);
+                    ctx.SaveChanges();
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));//set session object for authentication into restircted pages
                     Response.Redirect("/Index");
                 }
-                else if (user.Equals(req) && user.EmailVerified.Equals("false"))
+                else if (user.EmailVerified.Equals("false"))
                 {
                     sqlConnection.Close();
                     HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
-                    SendEmailValidation(req.username, true);
+                    SendEmailValidation(user.Email, true);
                     Response.Redirect("/Login?success=false&message=email");
                 }
                 else
@@ -100,99 +106,13 @@ namespace Online_Store.controllers.api
             }
         }
 
-        /*[HttpGet("[action]")]
-        public void GetLogin() //same as above but GET
-        {
-
-            Binders.UserLogin req = new Binders.UserLogin() { username = HttpContext.Request.Query["username"], password = HttpContext.Request.Query["password"], account = HttpContext.Request.Query["account"] };
-            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
-            sqlConnection.Open();
-            IEnumerable<Models.User> users = sqlConnection.Query<Models.User>("select * from [user] where email = @username AND password = @password", req);
-            if (users.Count() == 0)
-            {
-                Response.Redirect("/Login?success=false");
-            }
-            else if (users.Count() > 1)
-            {
-                Models.User user = null;
-
-                if (req.account != null && req.account.Equals("User")) //on means the radio was checked
-                {
-                    user = sqlConnection.QuerySingle<Models.User>("select * from [user] where email = @username AND password = @password AND Role=@account", req);
-                }
-                else if (req.account != null && req.account.Equals("Admin"))
-                {
-                    user = sqlConnection.QuerySingle<Models.User>("select * from [user] where email = @username AND password = @password AND Role=@account", req);
-                }
-                else
-                {
-                    Response.Redirect("/Login?success=false&message=choose");
-                    return;
-                }
-
-                if (user.Equals(req) && user.emailVerified.Equals("false"))
-                {
-                    sqlConnection.Close();
-                    user.role = req.account;
-                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
-                    SendEmailValidation(req.username, true);
-                    Response.Redirect("/Login?success=false&message=email");
-                }
-                else if (user.Equals(req) && user.emailVerified.Equals("true"))
-                {
-                    req.lastLogin = DateTime.Now.ToString();
-                    sqlConnection.Execute("update [user] set lastLogin = @lastLogin where email = @username and Role=@account", req);
-                    sqlConnection.Close();
-                    user.role = req.account;
-                    user.lastLogin = req.lastLogin;
-                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));//set session object for authentication into restircted pages
-                    Response.Redirect("/Admin/Index");
-                }
-            }
-            else
-            {
-                Models.User user = users.First();
-                if (user.Equals(req) && user.emailVerified.Equals("true"))
-                {
-                    req.lastLogin = DateTime.Now.ToString();
-                    sqlConnection.Execute("update [user] set lastLogin = @lastLogin where email = @username", req);
-                    sqlConnection.Close();
-                    user.lastLogin = req.lastLogin;
-                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));//set session object for authentication into restircted pages
-                    if (user.role.Equals("Admin"))
-                    {
-                        Response.Redirect("/Admin/Index");
-                    }
-                    else if (user.role.Equals("User"))
-                    {
-                        Response.Redirect("/Index");
-                    }
-                }
-                else if (user.Equals(req) && user.emailVerified.Equals("false"))
-                {
-                    sqlConnection.Close();
-                    HttpContext.Session.SetString("user", JsonSerializer.Serialize(user));
-                    SendEmailValidation(req.username, true);
-                    Response.Redirect("/Login?success=false&message=email");
-                }
-                else
-                {
-                    sqlConnection.Close();
-                    Response.Redirect("/Login?success=false");//add error so login can display such message
-                }
-            }
-        }*/
-
         [HttpPost("[action]")]
         public void Logout(bool bypassCacheCheck = false, bool redirect = true)
         {
 
             AuthFilter auth = new AuthFilter(_configuration);//pass through auth, providing means without adittional calls
-            Debug.WriteLine(bypassCacheCheck);
-            Debug.WriteLine(!bypassCacheCheck && !auth.isValid(HttpContext.Session.GetString("user")));
             if (!bypassCacheCheck && !auth.isValid(HttpContext.Session.GetString("user")))
             {
-                Debug.WriteLine(!auth.isValid(HttpContext.Session.GetString("user")));
                 string referer = ((string)HttpContext.Request.Headers["referer"]);
                 Response.Redirect(referer.Substring(0, referer.IndexOf("?") == -1 ? referer.Length : referer.IndexOf("?")) + "?success=false&message=0");
                 return;
@@ -212,7 +132,6 @@ namespace Online_Store.controllers.api
         [HttpPost("[action]")]
         public void Signup([FromForm] Binders.UserSignup req, [FromForm] IFormFile userProfilePicture)
         {
-            Console.WriteLine(req.password + " " + req.confPassword + " " + String.Equals(req.password, req.confPassword));
             if (!(String.Equals(req.password, req.confPassword)))
             {
                 Response.Redirect("/Signup?success=false&message=0");
@@ -224,6 +143,7 @@ namespace Online_Store.controllers.api
             if (isExisting == null)
             {
                 req.lastLogin = null;
+                req.password = Encoding.ASCII.GetString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(req.password)));
                 int rowsAffected = sqlConnection.Execute("exec os_sp_addUser @firstName, @lastName, @email, '', @password, @address, @age, 'false', 'User', @sex, @ethnicity", req); //inserts bound object into data
                                                                                                                                                                                              //statement above is sysnonymous to a prepared statement
                 sqlConnection.Close();

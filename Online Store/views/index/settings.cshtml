@@ -50,7 +50,7 @@
             </div>
             <div class="form-group col-md-6">
                 <label for="inputPassword4">Password</label>
-                <input type="password" class="form-control" id="inputPassword4" name="password" placeholder="@Model.Password" required>
+                <input type="password" class="form-control" id="inputPassword4" name="password" required>
             </div>
         </div>
         <div class="row">
@@ -88,7 +88,7 @@
                 <input type="file" name="userProfileImage" class="form-control" id="newUserProfileImage" accept="image/*" readonly>
             </div>
         </div>
-        <input type="hidden" id="userRole" readonly name="role_name" value="User">
+        <input type="hidden" id="userRole" readonly name="role" value="@Model.Role">
         <div class="w-100 pt-2 pb-2"></div>
         <button type="submit" class="btn btn-primary col-md-12">Change Info</button>
     </form>
@@ -148,9 +148,9 @@
         success: function (data, status, jqXHR) {
 
             $.each(data, function (index, gender) {
-                $(`<option value="${gender.id}">${gender.gender}</option>`).appendTo($("#inputGender"));
+                $(`<option value="${gender.id}">${gender.gender_}</option>`).appendTo($("#inputGender"));
             });
-                    $("#inputGender").val("@Model.Sex");
+            $("#inputGender").val("@Model.Sex");
         }
     });
     $.ajax({
@@ -160,7 +160,7 @@
         success: function (data, status, jqXHR) {
 
             $.each(data, function (index, gender) {
-                $(`<option value="${gender.id}">${gender.ethnicity}</option>`).appendTo($("#inputEthnicity"));
+                $(`<option value="${gender.id}">${gender.ethnicity_}</option>`).appendTo($("#inputEthnicity"));
             });
             $("#inputEthnicity").val("@Model.Ethnicity");
         }

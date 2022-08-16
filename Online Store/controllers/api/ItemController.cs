@@ -14,29 +14,24 @@ namespace Online_Store.controllers.api
     public class ItemController : ControllerBase
     {
         private IConfiguration _configuration;
+        private OnlineStore ctx = new OnlineStore();
         public ItemController(IConfiguration configuration) //allows us to get connection string
         {
             _configuration = configuration;
         }
 
         [HttpGet("[Action]")]
-        public IEnumerable<Items> GetItems()
+        public List<Models.OsSpGetItemsReturnModel> GetItems()
         {
-            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
-            sqlConnection.Open();
-            IEnumerable<Items> items = sqlConnection.Query<Items>("exec dbo.os_sp_getItems;");
-            sqlConnection.Close();
-            return items;
-
+            return ctx.OsSpGetItems();
         }
 
         [HttpDelete("/Admin/[Controller]/[Action]/{id}")]
         public void DeleteItem(int id)
         {
-            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
-            sqlConnection.Open();
-            sqlConnection.Execute("delete from [Items] where id = @id", new {@id = id});
-            sqlConnection.Close();
+            OnlineStore ctx = new OnlineStore();
+            ctx.Items.Remove(ctx.Items.Where(i=>i.Id == id).First());
+            ctx.SaveChanges();
         }
 
         [HttpGet("[Action]")]

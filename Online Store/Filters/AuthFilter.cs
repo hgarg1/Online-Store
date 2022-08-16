@@ -6,6 +6,8 @@ using Models;
 using Microsoft.Data.SqlClient;
 using System.Text.Json;
 using System.Diagnostics;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace Online_Store.Filters
 {
@@ -31,6 +33,8 @@ namespace Online_Store.Filters
                 && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidatePasswordResetLink") == -1
                 && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SetPassword") == -1
                 && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/ForgotPassword") == -1
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/User/GetGenders") == -1
+                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/User/GetEthnicities") == -1
                 ) 
                 && 
                 !isValid(context.HttpContext.Session.GetString("user"))
@@ -50,7 +54,10 @@ namespace Online_Store.Filters
 
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
-            User? _user = JsonSerializer.Deserialize<User>(user);
+            User? _user = JsonSerializer.Deserialize<User>(user, new JsonSerializerOptions()
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            });
 
             if(_user == null ) { return false; }
 
@@ -64,9 +71,10 @@ namespace Online_Store.Filters
             {
                 User? foundUser = users.FirstOrDefault();
                 if (foundUser == null) { return false;}
-
                 
-                if (foundUser.Equals(_user))
+                Debug.WriteLine(_user.Password);
+                Debug.WriteLine(foundUser.Password);
+                if (foundUser.Email.Equals(_user.Email) && _user.Password.Equals(foundUser.Password))
                 {
                     return true;
                 }

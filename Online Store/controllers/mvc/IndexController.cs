@@ -109,7 +109,10 @@ namespace Online_Store.controllers.mvc
                     return View(settingsModel);
                 }
             }
-            Settings model = JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user"));
+            Settings model = JsonSerializer.Deserialize<Settings>(HttpContext.Session.GetString("user"),new JsonSerializerOptions()
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            });
             model.IsActive = true;
             model.error = false;
             model.Message = "";

@@ -154,7 +154,7 @@
         success: function(data, status, jqXHR){
 
             $.each(data, function(index, gender){
-                $(`<option value="${gender.gender}">${gender.gender}</option>`).appendTo($("#inputGender"));
+                $(`<option value="${gender.gender_}">${gender.gender_}</option>`).appendTo($("#inputGender"));
             });
         }
     });
@@ -165,8 +165,8 @@
         method:"GET",
         success: function(data, status, jqXHR){
 
-            $.each(data, function(index, gender){
-                $(`<option value="${gender.ethnicity}">${gender.ethnicity}</option>`).appendTo($("#inputEthnicity"));
+            $.each(data, function(index, ethnicity){
+                $(`<option value="${ethnicity.ethnicity_}">${ethnicity.ethnicity_}</option>`).appendTo($("#inputEthnicity"));
             });
         }
     });

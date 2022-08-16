@@ -33,8 +33,8 @@ const ItemManagement = {
     RequestDeleteItemAll: function () {
 
         var _this = this;
-        $.each(this.Items, function (index, item) {
-            this.currentId = item.id;
+        $.each(_this.Items, function (index, item) {
+            _this.currentId = item.id;
             _this.RequestDeleteItem();
         });
     },
@@ -77,6 +77,7 @@ const ItemManagement = {
                 supplier: element.supplier
             })
         });
+        console.log(this.Items);
     }
 }
 

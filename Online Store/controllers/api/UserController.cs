@@ -5,6 +5,8 @@ using Models;
 using Dapper;
 using System.Text.Json;
 using Azure.Storage.Blobs;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace Online_Store.controllers.api
 {
@@ -14,6 +16,7 @@ namespace Online_Store.controllers.api
     {
         private IConfiguration _configuration;
         private AuthController authNeeds;
+        private OnlineStore ctx = new OnlineStore();
         public UserController(IConfiguration configuration)
         {
             _configuration = configuration;
@@ -26,7 +29,10 @@ namespace Online_Store.controllers.api
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
 
-            User cache = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"));
+            User cache = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            });
             sqlConnection.Close();
             HttpContext.Session.SetString("user", JsonSerializer.Serialize(req)); //updates cache
 
@@ -37,6 +43,8 @@ namespace Online_Store.controllers.api
                 client.Upload(userProfileImage.OpenReadStream(), true, default);
             }
             
+            req.Password = Encoding.ASCII.GetString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(req.Password)));
+
             if (!String.Equals(req.Email, cache.Email))
             {
                 sqlConnection.Execute("exec os_sp_updateUser @FirstName, @LastName, @Email, @LastLogin, @Password, @Address, @Age, 'false', @Role, @Sex, @Ethnicity;", req);
@@ -50,7 +58,6 @@ namespace Online_Store.controllers.api
             }
             else
             {
-                Console.WriteLine("same email being updated!");
                 sqlConnection.Execute("exec os_sp_updateUser @FirstName, @LastName, @Email, @LastLogin, @Password, @Address, @Age, 'true', @Role, @Sex, @Ethnicity;", req);
                 sqlConnection.Close();
                 req.EmailVerified = "true";
@@ -66,7 +73,10 @@ namespace Online_Store.controllers.api
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
 
-            Models.User req = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"));
+            Models.User req = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            });
 
             sqlConnection.Execute("delete from [user] where email = @email AND password = @password", new { 
                 @email = req.Email, @password = req.Password 
@@ -85,9 +95,13 @@ namespace Online_Store.controllers.api
                return false;
             }
             
-            User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"));
-            
-            if (user.Role <= RolesEnum.Administrator)
+            User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+            });
+
+            OnlineStore ctx = new OnlineStore();
+            if (user.Role <= ctx.Roles.Where(r=>r.RoleName.Equals("Admnistrator")).First().Id)
             {
                 return true;
             }
@@ -95,21 +109,21 @@ namespace Online_Store.controllers.api
         }
 
         [HttpGet("[Action]")]
-        public IEnumerable<Genders> GetGenders()
+        public IEnumerable<Gender> GetGenders()
         {
-            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
-            IEnumerable<Genders> genders = sqlConnection.Query<Genders>("select * from [dbo].[Genders];");
-            sqlConnection.Close();
-            return genders;
+            return ctx.Genders.AsList();
         }
 
         [HttpGet("[Action]")]
-        public IEnumerable<Ethnicities> GetEthnicities()
+        public IEnumerable<Ethnicity> GetEthnicities()
         {
-            SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
-            IEnumerable<Ethnicities> ethnicities = sqlConnection.Query<Ethnicities>("select * from [dbo].[Ethnicities];");
-            sqlConnection.Close();
-            return ethnicities;
+            return ctx.Ethnicities.AsList();
+        }
+
+        [HttpGet("[Action]")]
+        public List<User> GetUsers()
+        {
+            return ctx.Users.AsList();
         }
     }
 }

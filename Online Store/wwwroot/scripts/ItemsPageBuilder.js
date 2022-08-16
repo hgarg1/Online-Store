@@ -9,10 +9,9 @@ function buildGrid(data) {
         }
         let pictures = item.pictureLocation.split(";");
         map.set(item.name, pictures);
-        console.log(pictures);
-        $(`<div class="card col">
+        $(`<div class="card col" style="max-width: 30vw">
                 <h5 class="card-header">${item.name}</h5>
-                <img class="card-img-top" src = "https://archieonlinestore.blob.core.windows.net/images/${pictures[0]}" alt = "Card image cap" >
+                <img class="card-img-top" src = "https://archieonlinestore.blob.core.windows.net/images/${pictures[0]}" alt = "Card image cap" style="max-width: 500px" >
                 <div class="card-body">
                     <p class="card-text">Description: ${item.description}</p>
                     <p class="card-text">Price: $${item.price}</p>
