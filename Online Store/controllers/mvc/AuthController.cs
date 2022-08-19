@@ -60,11 +60,15 @@ namespace Online_Store.controllers.mvc
             AuthFilter auth = new AuthFilter(_configuration);
             if (auth.isValid(HttpContext.Session.GetString("user")))
             {
-                User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"));
+                User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"),new JsonSerializerOptions()
+                {
+                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
+                });
                 return RedirectToAction("Login", "Auth", new Binders.UserLogin() { username = user.Email, password = user.Password, role  = user.Role });
             }
             return View(new Login(""));
         }
+
 
         [HttpGet("/[action]")]
         public IActionResult Signup()
@@ -72,16 +76,13 @@ namespace Online_Store.controllers.mvc
             StringValues successCallback = new StringValues();
             if (Request.Query.TryGetValue("success", out successCallback))
             {
-                Console.WriteLine("success val: " +  successCallback);
                 if (String.Equals(successCallback, "false"))
                 {
-                    Console.WriteLine("something bad happened");
                     StringValues messageCallbback = new StringValues();
                     if (Request.Query.TryGetValue("message", out messageCallbback))
                     {
                         if(String.Equals(messageCallbback, "0"))
                         {
-                            Console.WriteLine("first error message case!");
                             Signup model = new Signup() { error = true, Message = "Please make sure passwords match!"};
                             return View(model);
                         }
@@ -107,10 +108,8 @@ namespace Online_Store.controllers.mvc
             StringValues successCallback = new StringValues();
             if (Request.Query.TryGetValue("success", out successCallback))
             {
-                Console.WriteLine("success val: " + successCallback);
                 if (String.Equals(successCallback, "false"))
                 {
-                    Console.WriteLine("something bad happened");
                     StringValues messageCallbback = new StringValues();
                     if (Request.Query.TryGetValue("message", out messageCallbback))
                     {
@@ -157,10 +156,8 @@ namespace Online_Store.controllers.mvc
             StringValues successCallback = new StringValues();
             if (Request.Query.TryGetValue("success", out successCallback))
             {
-                Console.WriteLine("success val: " + successCallback);
                 if (String.Equals(successCallback, "false"))
                 {
-                    Console.WriteLine("something bad happened");
                     StringValues messageCallback = new StringValues();
                     if (Request.Query.TryGetValue("message", out messageCallback))
                     {

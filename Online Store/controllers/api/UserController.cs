@@ -29,7 +29,7 @@ namespace Online_Store.controllers.api
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
 
-            User cache = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
+            User? cache = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
             {
                 ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
             });
@@ -73,7 +73,7 @@ namespace Online_Store.controllers.api
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
 
-            Models.User req = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
+            User? req = JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
             {
                 ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
             });
@@ -95,7 +95,7 @@ namespace Online_Store.controllers.api
                return false;
             }
             
-            User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
+            User? user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"), new JsonSerializerOptions()
             {
                 ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
             });

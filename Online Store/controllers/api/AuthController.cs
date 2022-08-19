@@ -30,13 +30,23 @@ namespace Online_Store.controllers.api
         }
 
         [AcceptVerbs("Get","Post",Route = "[Action]")]
-        public void Login([FromForm] Binders.UserLogin req)
+        public void Login([FromForm]Binders.UserLogin req)
         {
             SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
             sqlConnection.Open();
 
+            if(HttpContext.Request.Method.Equals(HttpMethod.Get.ToString()))
+            {
+                req.username = Request.Query["username"];
+                req.password = Request.Query["password"];
+                req.role = int.Parse(Request.Query["role"]);
+            }
+            else
+            {
+                req.password = Encoding.ASCII.GetString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(req.password)));
+            }
 
-            Models.User? user = ctx.Users.Where(u=>u.Email.Equals(req.username) && u.Password.Equals(Encoding.ASCII.GetString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(req.password))))).FirstOrDefault();
+            Models.User? user = ctx.Users.Where(u=>u.Email.Equals(req.username) && u.Password.Equals(req.password)).FirstOrDefault();
 
             if (user == null)
             {
@@ -178,7 +188,6 @@ namespace Online_Store.controllers.api
             string?[] arrayVal = { };
             if (userTokens.TryGetValue(reqUser.FirstName + " " + reqUser.LastName, out arrayVal))//handles if user requests new link, voids old one
             {
-                Console.WriteLine("Token Provided: " + token + " Token Found in DB: " + arrayVal[0]);
                 if (!arrayVal[0].Equals(token))
                 {
                     Response.Redirect("/Email?success=false&message=1"); //wrong token
@@ -207,7 +216,6 @@ namespace Online_Store.controllers.api
         [HttpGet("[action]")]
         public void SendEmailValidation([FromQuery] string email, bool noRedirect = false)
         {
-            Console.WriteLine(email);
 
             string? cache = HttpContext.Session.GetString("user");
             if (cache == null)
@@ -215,8 +223,6 @@ namespace Online_Store.controllers.api
                 Response.Redirect("/Email?success=false&message=0"); //user doesn't exist
                 return;
             }
-
-
 
             Models.User reqUser = JsonSerializer.Deserialize<Models.User>(cache);
 
