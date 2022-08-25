@@ -14,10 +14,54 @@
             if (img_pin == null) {
                 img_pin = 'images/icons/location.png';
             }
-            if (data_map_x == null || data_map_y == null) {
+            if (data_map_x == "" && data_map_y == "") {
                 navigator.geolocation.getCurrentPosition(function (position) {
-                    data_map_x = position.coords.longitude;
-                    data_map_y = position.coords.latitude;
+                    data_map_x = position.coords.latitude;
+                    data_map_y = position.coords.longitude;
+
+                    var latitude = data_map_x,
+                        longitude = data_map_y,
+                        map_zoom = 14;
+
+                    var locations = [
+                        ['Welcome', latitude, longitude, 2]
+                    ];
+
+                    if (selector_map !== undefined) {
+                        var map = new google.maps.Map(document.getElementById('google_map'), {
+                            zoom: map_zoom,
+                            scrollwheel: false,
+                            zoomControl: false,
+                            disableDoubleClickZoom: true,
+                            navigationControl: true,
+                            mapTypeControl: false,
+                            scaleControl: false,
+                            draggable: draggable,
+                            styles: style,
+                            center: new google.maps.LatLng(latitude, longitude),
+                            mapTypeId: google.maps.MapTypeId.ROADMAP
+                        });
+                    }
+
+                    var infowindow = new google.maps.InfoWindow();
+
+                    var marker, i;
+
+                    for (i = 0; i < locations.length; i++) {
+
+                        marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(locations[i][1], locations[i][2]),
+                            map: map,
+                            icon: img_pin
+                        });
+
+                        google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                            return function () {
+                                infowindow.setContent(locations[i][0]);
+                                infowindow.open(map, marker);
+                            }
+                        })(marker, i));
+                    }
                 });
             }
             if (scrollwhell == null) {
@@ -195,51 +239,6 @@
                 ]
             }
             ];
-
-            var latitude = data_map_x,
-                longitude = data_map_y,
-                map_zoom = 14;
-
-            var locations = [
-                ['Welcome', latitude, longitude, 2]
-            ];
-
-            if (selector_map !== undefined) {
-                var map = new google.maps.Map(document.getElementById('google_map'), {
-                    zoom: 13,
-                    scrollwheel: false,
-                    zoomControl: false,  
-                    disableDoubleClickZoom: true,
-                    navigationControl: true,
-                    mapTypeControl: false,
-                    scaleControl: false,
-                    draggable: draggable,
-                    styles: style,
-                    center: new google.maps.LatLng(latitude, longitude),
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
-                });
-            }
-
-            var infowindow = new google.maps.InfoWindow();
-
-            var marker, i;
-
-            for (i = 0; i < locations.length; i++) {
-
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(locations[i][1], locations[i][2]),
-                    map: map,
-                    icon: img_pin
-                });
-
-                google.maps.event.addListener(marker, 'click', (function(marker, i) {
-                    return function() {
-                        infowindow.setContent(locations[i][0]);
-                        infowindow.open(map, marker);
-                    }
-                })(marker, i));
-            }
-
         });
 
 })(jQuery);

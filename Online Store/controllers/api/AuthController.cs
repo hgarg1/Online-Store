@@ -408,13 +408,14 @@ namespace Online_Store.controllers.api
                 Response.Redirect("/ForgotPassword?success=false&message=session");
                 return;
             }
-            else if (JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user")).Email != null)
+            else if (JsonSerializer.Deserialize<Models.User>(HttpContext.Session.GetString("user")).Email == null)
             {
                 Response.Redirect("/ForgotPassword?success=false&message=token");
                 return;
             }
             else
             {
+                req.password = Encoding.ASCII.GetString(MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(req.password)));
                 SqlConnection sqlConnection = new SqlConnection(_configuration.GetConnectionString("SQL"));
                 sqlConnection.Open();
                 int numRows = sqlConnection.Execute("update [user] set password = @password where email = @username", req);
