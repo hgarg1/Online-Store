@@ -72,8 +72,6 @@ namespace Online_Store.Filters
                 User? foundUser = users.FirstOrDefault();
                 if (foundUser == null) { return false;}
                 
-                Debug.WriteLine(_user.Password);
-                Debug.WriteLine(foundUser.Password);
                 if (foundUser.Email.Equals(_user.Email) && _user.Password.Equals(foundUser.Password))
                 {
                     return true;

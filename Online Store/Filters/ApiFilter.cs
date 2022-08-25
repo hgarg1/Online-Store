@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
-using Dapper;
 using Models;
-using Microsoft.Data.SqlClient;
 using System.Text.Json;
-using System.Diagnostics;
 
 public class ApiFilter : IActionFilter
 {
@@ -31,7 +28,6 @@ public class ApiFilter : IActionFilter
         }
 
         string reqApiUrl = context.HttpContext.Request.Path;
-        Console.WriteLine(reqApiUrl);
         if (reqApiUrl.IndexOf("IsAdmin")!=-1)//whitelist
         {
             return;
