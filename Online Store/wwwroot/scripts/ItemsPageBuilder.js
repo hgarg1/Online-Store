@@ -9,7 +9,9 @@ function buildGrid(data) {
         }
         let pictures = item.pictureLocation.split(";");
         map.set(item.name, pictures);
-        $(`<div class="card col" style="max-width: 30vw">
+        $(  
+            `<div class="card col">
+                <span class="message alert"></span>
                 <h5 class="card-header">${item.name}</h5>
                 <img class="card-img-top" src = "https://archieonlinestore.blob.core.windows.net/images/${pictures[0]}" alt = "Card image cap" style="max-width: 500px" >
                 <div class="card-body">
@@ -29,7 +31,8 @@ function buildGrid(data) {
                         </div>
                     </form>
                 </div>
-            </div>`).appendTo($(`#Row${rowIndex - 1}`));
+            </div>`
+        ).appendTo($(`#Row${rowIndex - 1}`));
     });
 }
 

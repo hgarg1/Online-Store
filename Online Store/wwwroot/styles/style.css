@@ -17,4 +17,15 @@
 
 form {
     justify-content: space-around;
-}   
+}
+
+.card {
+    max-width: 30vw;
+}
+
+@media screen and (max-width: 767px){
+    .card{
+        max-width: 100%;
+        margin-left: 5%;
+    }
+}

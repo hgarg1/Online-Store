@@ -12,6 +12,7 @@ using System.Text;
 using Azure.Storage.Blobs;
 using System.Diagnostics;
 using Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Online_Store.controllers.api
 {
@@ -24,11 +25,18 @@ namespace Online_Store.controllers.api
         private static Dictionary<string, string[]> userTokens = new Dictionary<string, string[]>();
 
         private IConfiguration _configuration;
+
         public AuthController(IConfiguration configuration) //allows us to get connection string
         {
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// login controller route that will get user authenticated into the web application
+        /// </summary>
+        /// <param name="req">
+        /// request payload from front-end
+        /// </param>
         [AcceptVerbs("Get","Post",Route = "[Action]")]
         public void Login([FromForm]Binders.UserLogin req)
         {
@@ -342,7 +350,11 @@ namespace Online_Store.controllers.api
             smtpClient.EnableSsl = true;
             smtpClient.UseDefaultCredentials = false;
             smtpClient.Credentials = new NetworkCredential("hgarg1@terpmail.umd.edu", "Deepak@2003_101");
-            smtpClient.Send(new MailMessage("hgarg1@terpmail.umd.edu", req.username, "Your Password Reset Link Link | Online Store", $"Please use this url in the SAME browser when resseting your password.\nLink: {Request.Scheme}://{Request.Host}/Auth/ValidatePasswordResetLink/{arrayVal[0]}\nThe link will expire in 5 hours.\nThanks for shopping with us!\nSincerely, Online Store Team"));
+            smtpClient.Send(new MailMessage("hgarg1@terpmail.umd.edu", req.username, 
+                "Your Password Reset Link Link | Online Store", 
+                $"Please use this url in the SAME browser when resseting your password.\n" +
+                $"Link: {Request.Scheme}://{Request.Host}/Auth/ValidatePasswordResetLink/{arrayVal[0]}\n" +
+                $"The link will expire in 5 hours.\nThanks for shopping with us!\nSincerely, Online Store Team"));
 
             HttpContext.Session.SetString("user", JsonSerializer.Serialize(new Models.User() { Email = req.username }));
 
