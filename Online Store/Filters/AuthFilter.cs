@@ -25,19 +25,18 @@ namespace Online_Store.Filters
             //first part is list of whitelisted pages, do NOT black list but rather whitelist
             if (
                 (
-                context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Login") == -1 
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Signup") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Email") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidateEmail") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SendEmailValidation") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidatePasswordResetLink") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SetPassword") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/ForgotPassword") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/User/GetGenders") == -1
-                && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/User/GetEthnicities") == -1
+                    context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Login") == -1 
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Signup") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Email") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidateEmail") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SendEmailValidation") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/ValidatePasswordResetLink") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/Auth/SetPassword") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/ForgotPassword") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/User/GetGenders") == -1
+                    && context.HttpContext.Request.Path.ToUriComponent().IndexOf("/User/GetEthnicities") == -1
                 ) 
-                && 
-                !isValid(context.HttpContext.Session.GetString("user"))
+                && !IsValid(context.HttpContext.Session.GetString("user"))
             )
             {
                 //context.Result = new FileStreamResult(fileStream: new FileStream("wwwroot/403.html", FileMode.Open), contentType: "text/html");
@@ -48,7 +47,7 @@ namespace Online_Store.Filters
         /**
          * <h1>validates cache as being authentic</h1>
          */
-        public bool isValid(string user)//used a lot, self explanatory
+        public bool IsValid(string user)//used a lot, self explanatory
         {
             if(user == null || String.Equals(user, "")) { return false; } //precheck
 

@@ -129,7 +129,7 @@ namespace Online_Store.controllers.api
         {
 
             AuthFilter auth = new AuthFilter(_configuration);//pass through auth, providing means without adittional calls
-            if (!bypassCacheCheck && !auth.isValid(HttpContext.Session.GetString("user")))
+            if (!bypassCacheCheck && !auth.IsValid(HttpContext.Session.GetString("user")))
             {
                 string referer = ((string)HttpContext.Request.Headers["referer"]);
                 Response.Redirect(referer.Substring(0, referer.IndexOf("?") == -1 ? referer.Length : referer.IndexOf("?")) + "?success=false&message=0");

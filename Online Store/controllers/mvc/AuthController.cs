@@ -58,7 +58,7 @@ namespace Online_Store.controllers.mvc
                 }
             }
             AuthFilter auth = new AuthFilter(_configuration);
-            if (auth.isValid(HttpContext.Session.GetString("user")))
+            if (auth.IsValid(HttpContext.Session.GetString("user")))
             {
                 User user = JsonSerializer.Deserialize<User>(HttpContext.Session.GetString("user"),new JsonSerializerOptions()
                 {
